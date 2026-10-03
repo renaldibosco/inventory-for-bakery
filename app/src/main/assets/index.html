@@ -1,16 +1,16 @@
 <title>Noor Bakery Stock</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Tamil:wght@400;600&display=swap">
 <style>
-/* Layout: shop header, four figures, alerts strip, tabbed work area, SQL log that shows each query as it runs */
+/* Layout: lock screen, shop header, owner figures, alerts, tabbed work area, SQL log beside it */
 :root{
   --bg:#F1F0EC; --surface:#FFFFFF; --sunk:#E9E6E0; --ink:#251D18; --muted:#6C635C; --line:#DCD7CF;
   --accent:#7A2C50; --accent-ink:#FFFFFF; --accent-soft:#F3E4EB; --butter:#E7B23C;
   --ok:#2C7349; --ok-soft:#E1F0E6; --warn:#9A6411; --warn-soft:#FBEFD6; --bad:#A8261D; --bad-soft:#F8E1DE;
-  --code-bg:#221B17; --code-ink:#F1E7DD; --code-kw:#E7B23C; --code-str:#9ED3A8;
-  --display:"Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
-  --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --code-bg:#221B17; --code-ink:#F1E7DD; --code-kw:#E7B23C; --code-str:#9ED3A8; --scrim:rgba(20,14,12,.55);
+  --display:"Bricolage Grotesque", "Noto Sans Tamil", "Trebuchet MS", system-ui, sans-serif;
+  --body:"Figtree", "Noto Sans Tamil", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
   --r:10px;
 }
@@ -18,44 +18,50 @@
   --bg:#191513; --surface:#231E1B; --sunk:#2C2622; --ink:#F2ECE6; --muted:#A99F97; --line:#3A332E;
   --accent:#E28FB4; --accent-ink:#2A1019; --accent-soft:#3A2330; --butter:#E7B23C;
   --ok:#7CCB97; --ok-soft:#1F3328; --warn:#E8B45A; --warn-soft:#3A2D16; --bad:#F08A80; --bad-soft:#3D201D;
-  --code-bg:#120F0D; --code-ink:#EDE3D9; --code-kw:#E7B23C; --code-str:#9ED3A8; color-scheme:dark }}
+  --code-bg:#120F0D; --code-ink:#EDE3D9; --code-kw:#E7B23C; --code-str:#9ED3A8; --scrim:rgba(0,0,0,.65); color-scheme:dark }}
 :root[data-theme="dark"]{
   --bg:#191513; --surface:#231E1B; --sunk:#2C2622; --ink:#F2ECE6; --muted:#A99F97; --line:#3A332E;
   --accent:#E28FB4; --accent-ink:#2A1019; --accent-soft:#3A2330; --butter:#E7B23C;
   --ok:#7CCB97; --ok-soft:#1F3328; --warn:#E8B45A; --warn-soft:#3A2D16; --bad:#F08A80; --bad-soft:#3D201D;
-  --code-bg:#120F0D; --code-ink:#EDE3D9; --code-kw:#E7B23C; --code-str:#9ED3A8; color-scheme:dark }
+  --code-bg:#120F0D; --code-ink:#EDE3D9; --code-kw:#E7B23C; --code-str:#9ED3A8; --scrim:rgba(0,0,0,.65); color-scheme:dark }
 
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;padding:20px 16px 48px}
-.wrap{max-width:1120px;margin:0 auto;display:grid;gap:20px}
+.wrap{max-width:1160px;margin:0 auto;display:grid;gap:18px}
 h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.01em}
-h1{font-size:clamp(1.6rem,4vw,2.2rem);line-height:1.1}
+h1{font-size:clamp(1.5rem,4vw,2.1rem);line-height:1.1}
 h2{font-size:1.25rem}
 h3{font-size:1rem}
 .num{font-variant-numeric:tabular-nums}
 button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.muted{color:var(--muted)}
+[data-role="Staff"] .owner-only{display:none!important}
 
 header.top{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-end;justify-content:space-between}
-.brand{display:grid;gap:4px}
+.brand{display:grid;gap:4px;min-width:0}
 .eyebrow{font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:600}
 .brand p{margin:0;color:var(--muted)}
 .demo-tag{display:inline-block;background:var(--butter);color:#2A1F0A;font-family:var(--mono);font-size:.7rem;padding:2px 8px;border-radius:99px;vertical-align:middle;margin-left:8px;letter-spacing:.04em}
 .top-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .today{font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+.who{font-size:.82rem;font-weight:600;background:var(--accent-soft);color:var(--accent);padding:5px 10px;border-radius:99px}
 
-.btn{border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:600;font-size:.9rem;white-space:nowrap}
+.btn{border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:600;font-size:.9rem;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .btn:hover{border-color:var(--muted)}
 .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .btn.primary:hover{filter:brightness(1.08)}
+.btn.wa{background:#1F8F4E;color:#fff;border-color:#1F8F4E}
 .btn.small{padding:5px 10px;font-size:.82rem}
+.btn.big{padding:12px 18px;font-size:1rem;width:100%}
 .btn.danger{color:var(--bad);border-color:var(--bad)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
+.linkbtn{border:0;background:none;padding:0;color:var(--accent);font-weight:600;font-size:.8rem;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
 
 .figures{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .fig{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;gap:2px;align-content:start}
 .fig .label{font-size:.78rem;color:var(--muted);font-weight:500}
-.fig .value{font-family:var(--display);font-size:1.7rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.15}
+.fig .value{font-family:var(--display);font-size:1.6rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.15}
 .fig .sub{font-size:.8rem;color:var(--muted)}
 .fig.alert .value{color:var(--bad)}
 .fig.warn .value{color:var(--warn)}
@@ -64,15 +70,17 @@ header.top{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-end;justif
 .alerts{display:grid;gap:6px}
 .alert-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:8px;padding:8px 12px;font-size:.9rem}
 .alert-row.bad{border-left-color:var(--bad)}
+.alert-row.info{border-left-color:var(--accent)}
 .alert-row .what{flex:1;min-width:0}
 
-.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);scrollbar-width:none}
-.tab{border:0;background:none;padding:10px 14px;cursor:pointer;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tabs{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--line);scrollbar-width:none;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:3}
+.tab{border:0;background:none;padding:10px 12px;cursor:pointer;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap}
 .tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
 .tab .count{font-family:var(--mono);font-size:.72rem;background:var(--bad-soft);color:var(--bad);border-radius:99px;padding:1px 6px;margin-left:4px}
 
-.work{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
-@media (max-width:980px){.work{grid-template-columns:minmax(0,1fr)}}
+.work{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;align-items:start}
+[data-role="Staff"] .work{grid-template-columns:minmax(0,1fr)}
+@media (max-width:1020px){.work{grid-template-columns:minmax(0,1fr)}}
 .panel{display:grid;gap:14px;min-width:0}
 .panel-head{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center}
 .panel-head p{margin:2px 0 0;color:var(--muted);font-size:.88rem}
@@ -83,13 +91,14 @@ th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);verti
 th{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;background:var(--sunk);white-space:nowrap}
 tr:last-child td{border-bottom:0}
 td.r,th.r{text-align:right}
-td .muted{color:var(--muted);font-size:.8rem}
+td .muted{font-size:.8rem}
 .item-name{font-weight:600}
 
 .pill{display:inline-block;font-size:.74rem;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap;margin:1px 2px 1px 0}
 .pill.ok{background:var(--ok-soft);color:var(--ok)}
 .pill.warn{background:var(--warn-soft);color:var(--warn)}
 .pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.info{background:var(--accent-soft);color:var(--accent)}
 
 .bar{height:6px;background:var(--sunk);border-radius:99px;overflow:hidden;min-width:70px}
 .bar span{display:block;height:100%;background:var(--ok);border-radius:99px}
@@ -98,30 +107,79 @@ td .muted{color:var(--muted);font-size:.8rem}
 .sell{display:flex;gap:6px;align-items:center;justify-content:flex-end}
 .sell input{width:56px;padding:5px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);text-align:center}
 
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:12px;min-width:0}
+.card > p{margin:0}
 .form{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;align-items:end}
 .field{display:grid;gap:4px;min-width:0}
 .field label{font-size:.78rem;color:var(--muted);font-weight:600}
-.field input,.field select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);width:100%}
+.field input,.field select,.field textarea{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);width:100%}
 
 .need-list{display:grid;gap:6px}
 .need{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:center;font-size:.9rem;padding:6px 0;border-bottom:1px dashed var(--line)}
 .need:last-child{border-bottom:0}
 .need .have{color:var(--muted);font-size:.8rem}
 
-.sales-bars{display:grid;gap:8px}
-.sb{display:grid;grid-template-columns:140px minmax(0,1fr) 80px;gap:10px;align-items:center;font-size:.88rem}
-.sb .track{height:14px;background:var(--sunk);border-radius:4px;overflow:hidden}
-.sb .track span{display:block;height:100%;background:var(--accent);border-radius:4px}
-@media (max-width:480px){.sb{grid-template-columns:100px minmax(0,1fr) 64px}}
+/* Billing */
+.pos{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+@media (max-width:820px){.pos{grid-template-columns:minmax(0,1fr)}}
+.scanrow{display:flex;gap:8px;flex-wrap:wrap}
+.scanrow input{flex:1;min-width:140px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.tile{position:relative;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;cursor:pointer;display:grid;gap:4px;align-content:start;min-height:92px}
+.tile:hover:not(:disabled){border-color:var(--accent)}
+.tile:active:not(:disabled){transform:scale(.98)}
+.tile:disabled{opacity:.5;cursor:not-allowed}
+.tile .t-name{font-weight:600;font-size:.92rem;line-height:1.25}
+.tile .t-price{font-family:var(--display);font-weight:700;font-size:1.1rem}
+.tile .t-left{font-size:.76rem;color:var(--muted)}
+.tile .t-in{position:absolute;top:8px;right:8px;background:var(--accent);color:var(--accent-ink);font-family:var(--mono);font-size:.74rem;border-radius:99px;min-width:22px;height:22px;display:grid;place-items:center;padding:0 6px}
+.cart{position:sticky;top:calc(env(safe-area-inset-top,0px) + 56px)}
+@media (max-width:820px){.cart{position:static}}
+.cart-lines{display:grid;gap:8px}
+.cline{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.cline .nm{font-weight:600;font-size:.9rem;min-width:0}
+.cline .amt{font-variant-numeric:tabular-nums;font-weight:600}
+.qtyctl{display:flex;align-items:center;gap:6px}
+.qtyctl button{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--bg);cursor:pointer;font-weight:700}
+.qtyctl span{min-width:24px;text-align:center;font-variant-numeric:tabular-nums}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{flex:1;border:0;background:var(--surface);padding:8px;cursor:pointer;font-weight:600;font-size:.88rem}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.totals{display:grid;gap:2px}
+.totals .grand{display:flex;justify-content:space-between;font-family:var(--display);font-size:1.4rem;font-weight:700}
+.totals .taxline{display:flex;justify-content:space-between;font-size:.82rem;color:var(--muted)}
+.empty{font-size:.88rem;color:var(--muted);margin:0}
+
+/* Cake orders */
+.orders{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.order{display:grid;gap:8px;align-content:start}
+.order .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.order .cake-text{font-style:italic;color:var(--muted);font-size:.9rem}
+.order .money{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;font-size:.8rem;color:var(--muted)}
+.order .money b{display:block;font-size:.95rem;color:var(--ink);font-variant-numeric:tabular-nums}
+.order .acts{display:flex;gap:6px;flex-wrap:wrap}
+
+/* Reports */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.kpi{background:var(--sunk);border-radius:8px;padding:10px 12px;display:grid;gap:2px}
+.kpi span{font-size:.76rem;color:var(--muted);font-weight:600}
+.kpi b{font-family:var(--display);font-size:1.25rem;font-variant-numeric:tabular-nums}
+.chart{width:100%;height:auto;display:block}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:720px){.two{grid-template-columns:1fr}}
+.mini{display:grid;gap:6px;font-size:.88rem}
+.mini div{display:flex;justify-content:space-between;gap:10px}
+.margin-bar{height:8px;background:var(--sunk);border-radius:99px;overflow:hidden;min-width:60px}
+.margin-bar span{display:block;height:100%;border-radius:99px}
 
 /* SQL side */
-.sqlbox{background:var(--code-bg);color:var(--code-ink);border-radius:var(--r);padding:14px;display:grid;gap:10px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
-@media (max-width:980px){.sqlbox{position:static}}
+.sqlbox{background:var(--code-bg);color:var(--code-ink);border-radius:var(--r);padding:14px;display:grid;gap:10px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 56px)}
+@media (max-width:1020px){.sqlbox{position:static}}
 .sqlbox h3{color:var(--code-ink);font-size:.95rem;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .sqlbox .hint{font-size:.78rem;opacity:.7;margin:0}
 .log{display:grid;gap:8px;max-height:460px;overflow:auto}
-.log pre{margin:0;font-family:var(--mono);font-size:.76rem;line-height:1.5;white-space:pre-wrap;word-break:break-word;padding:8px 10px;background:rgba(255,255,255,.05);border-radius:6px;border-left:3px solid var(--code-kw)}
+.log pre{margin:0;font-family:var(--mono);font-size:.74rem;line-height:1.5;white-space:pre-wrap;word-break:break-word;padding:8px 10px;background:rgba(255,255,255,.05);border-radius:6px;border-left:3px solid var(--code-kw)}
 .log pre.fresh{animation:flash 1.2s ease-out}
 @keyframes flash{from{background:rgba(231,178,60,.25)}to{background:rgba(255,255,255,.05)}}
 .kw{color:var(--code-kw);font-weight:500}
@@ -133,144 +191,287 @@ td .muted{color:var(--muted);font-size:.8rem}
 .chip{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:4px 12px;font-size:.82rem;cursor:pointer}
 .chip:hover{border-color:var(--accent);color:var(--accent)}
 .err{color:var(--bad);font-family:var(--mono);font-size:.85rem;margin:0}
-.schema pre{margin:0;font-family:var(--mono);font-size:.78rem;white-space:pre;overflow-x:auto;background:var(--code-bg);color:var(--code-ink);padding:12px;border-radius:8px}
-details summary{cursor:pointer;font-weight:600;font-size:.88rem}
-.muted{color:var(--muted)}
+.schema pre{margin:0;font-family:var(--mono);font-size:.76rem;white-space:pre;overflow-x:auto;background:var(--code-bg);color:var(--code-ink);padding:12px;border-radius:8px}
+details summary{cursor:pointer;font-weight:600;font-size:.9rem}
 
-.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-weight:600;font-size:.9rem;box-shadow:0 6px 24px rgba(0,0,0,.2);max-width:calc(100% - 32px);z-index:10}
+/* Modal */
+.modal-back{position:fixed;inset:0;background:var(--scrim);display:grid;place-items:center;padding:16px;z-index:20;overflow:auto}
+.modal{background:var(--surface);border-radius:14px;width:100%;max-width:420px;padding:18px;display:grid;gap:14px;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:calc(100% - 8px);overflow:auto}
+.modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.x{border:0;background:var(--sunk);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:1.1rem}
+.receipt{font-family:var(--mono);font-size:.82rem;background:var(--bg);border:1px dashed var(--line);border-radius:8px;padding:14px;display:grid;gap:4px}
+.receipt .c{text-align:center}
+.receipt .row{display:flex;justify-content:space-between;gap:10px}
+.receipt hr{border:0;border-top:1px dashed var(--line);margin:6px 0;width:100%}
+.receipt .big{font-weight:700;font-size:1rem}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.acts > *{flex:1}
+.barcode-box{background:#fff;border-radius:8px;padding:12px;display:grid;place-items:center}
+.barcode-box svg{max-width:100%;height:auto}
+.scan-video{width:100%;border-radius:10px;background:#000;aspect-ratio:4/3;object-fit:cover;max-width:100%}
+
+/* Lock screen */
+.lock{position:fixed;inset:0;background:var(--bg);z-index:30;display:grid;place-items:center;padding:16px;overflow:auto}
+.lock-card{width:100%;max-width:360px;display:grid;gap:16px;text-align:center}
+.lock-card .logo{width:64px;height:64px;border-radius:16px;background:var(--accent);margin:0 auto;display:grid;place-items:center}
+.lock-card input{font-family:var(--mono);font-size:1.6rem;letter-spacing:.5em;text-align:center;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);width:100%}
+.lock-card .seg button{padding:12px}
+.lock-err{color:var(--bad);font-size:.88rem;margin:0;min-height:1.3em}
+
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-weight:600;font-size:.9rem;box-shadow:0 6px 24px rgba(0,0,0,.2);max-width:calc(100% - 32px);z-index:40}
 footer{font-size:.8rem;color:var(--muted)}
+
 /* Phone: tables become cards */
 @media (max-width:640px){
+  body{padding-top:14px}
   .table-wrap:has(table.cards){background:none;border:0;overflow:visible}
   table.cards thead{display:none}
   table.cards,table.cards tbody{display:block}
   table.cards tr{display:grid;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:10px}
   table.cards td{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:3px 0;border:0;text-align:right}
   table.cards td:first-child{display:block;text-align:left;padding-bottom:6px;border-bottom:1px dashed var(--line);margin-bottom:4px}
-  table.cards td[data-label]::before{content:attr(data-label);font-size:.74rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;text-align:left;flex-shrink:0}
+  table.cards td[data-label]::before{content:attr(data-label);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;text-align:left;flex-shrink:0}
   table.cards td > div{min-width:0}
-  table.cards .bar{flex:1;max-width:60%}
+  table.cards .bar,table.cards .margin-bar{flex:1;max-width:60%}
   table.cards td.sell-cell{padding-top:8px}
   table.cards td.sell-cell .sell{width:100%}
   table.cards td.sell-cell .sell input{flex:1;padding:9px;font-size:1rem}
   table.cards td.sell-cell .btn{padding:9px 22px;font-size:.95rem}
   .sqlbox .log{max-height:300px}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-@media (prefers-reduced-motion:reduce){.log pre.fresh{animation:none}}
+@media (prefers-reduced-motion:reduce){.log pre.fresh{animation:none}.tile:active:not(:disabled){transform:none}}
 </style>
+
+<!-- Lock screen -->
+<div class="lock" id="lock">
+  <div class="lock-card">
+    <div class="logo" aria-hidden="true">
+      <svg width="40" height="40" viewBox="0 0 108 108"><path fill="#E7B23C" d="M30,64 Q30,38 54,38 Q78,38 78,64 L78,72 Q78,76 74,76 L34,76 Q30,76 30,72 Z"/><path stroke="#7A2C50" stroke-width="3.5" stroke-linecap="round" fill="none" d="M43,49 L47,59 M52,46 L56,56 M61,49 L65,59"/></svg>
+    </div>
+    <div><h1 style="font-size:1.6rem">Noor Bakery</h1><p class="muted" style="margin:4px 0 0" data-t="Who is using the app?">Who is using the app?</p></div>
+    <div class="seg" id="roleSeg">
+      <button type="button" data-role="Owner" aria-pressed="true" data-t="Owner">Owner</button>
+      <button type="button" data-role="Staff" aria-pressed="false" data-t="Staff">Staff</button>
+    </div>
+    <form id="pinForm" style="display:grid;gap:10px">
+      <label for="pinInput" class="muted" style="font-size:.85rem" data-t="Enter 4-digit PIN">Enter 4-digit PIN</label>
+      <input id="pinInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off" pattern="[0-9]*">
+      <p class="lock-err" id="pinErr"></p>
+      <button class="btn primary big" type="submit" data-t="Unlock">Unlock</button>
+    </form>
+    <p class="muted" style="font-size:.8rem;margin:0"><span data-t="Demo PINs">Demo PINs</span>: <span data-t="Owner">Owner</span> 1234 · <span data-t="Staff">Staff</span> 0000</p>
+    <button class="linkbtn" type="button" data-lang-toggle>தமிழ்</button>
+  </div>
+</div>
 
 <div class="wrap">
   <header class="top">
     <div class="brand">
-      <span class="eyebrow">Inventory system</span>
+      <span class="eyebrow" data-t="Inventory system">Inventory system</span>
       <h1>Noor Bakery <span class="demo-tag">DEMO</span></h1>
-      <p>Ingredients, baked goods, sales and expiry, all stored in a SQL database.</p>
+      <p data-t="Billing, stock, baking, cake orders and reports, all on a SQL database.">Billing, stock, baking, cake orders and reports, all on a SQL database.</p>
     </div>
     <div class="top-actions">
       <span class="today" id="todayLabel"></span>
-      <button class="btn" id="resetBtn" type="button">Reset demo data</button>
+      <span class="who" id="whoLabel"></span>
+      <button class="btn small" type="button" data-lang-toggle>தமிழ்</button>
+      <button class="btn small" type="button" id="lockBtn" data-t="Lock">Lock</button>
+      <button class="btn small owner-only" id="resetBtn" type="button" data-t="Reset demo data">Reset demo data</button>
     </div>
   </header>
 
-  <section class="figures" aria-label="Today at a glance">
-    <div class="fig"><span class="label">Today's sales</span><span class="value" id="fSales">₹0</span><span class="sub" id="fSalesSub"></span></div>
-    <div class="fig"><span class="label">Ingredient stock value</span><span class="value" id="fValue">₹0</span><span class="sub">at purchase cost</span></div>
-    <div class="fig alert" id="fLowBox"><span class="label">Need reordering</span><span class="value" id="fLow">0</span><span class="sub">ingredients at or below reorder level</span></div>
-    <div class="fig warn" id="fExpBox"><span class="label">Expiring / expired</span><span class="value" id="fExp">0</span><span class="sub">within the next 3 days</span></div>
+  <section class="figures owner-only" aria-label="Today at a glance">
+    <div class="fig"><span class="label" data-t="Today's sales">Today's sales</span><span class="value" id="fSales">₹0</span><span class="sub" id="fSalesSub"></span></div>
+    <div class="fig"><span class="label" data-t="Ingredient stock value">Ingredient stock value</span><span class="value" id="fValue">₹0</span><span class="sub" data-t="at purchase cost">at purchase cost</span></div>
+    <div class="fig alert"><span class="label" data-t="Need reordering">Need reordering</span><span class="value" id="fLow">0</span><span class="sub" data-t="ingredients at or below reorder level">ingredients at or below reorder level</span></div>
+    <div class="fig warn"><span class="label" data-t="Cake orders open">Cake orders open</span><span class="value" id="fCakes">0</span><span class="sub" id="fCakesSub"></span></div>
   </section>
 
   <section class="alerts" id="alerts" aria-label="Alerts"></section>
 
   <nav class="tabs" role="tablist" id="tabs">
-    <button class="tab" role="tab" data-tab="ingredients" aria-selected="true">Ingredients</button>
-    <button class="tab" role="tab" data-tab="products" aria-selected="false">Bakery items</button>
-    <button class="tab" role="tab" data-tab="bake" aria-selected="false">Bake a batch</button>
-    <button class="tab" role="tab" data-tab="sales" aria-selected="false">Sales</button>
-    <button class="tab" role="tab" data-tab="history" aria-selected="false">Stock history</button>
-    <button class="tab" role="tab" data-tab="sql" aria-selected="false">SQL console</button>
+    <button class="tab" role="tab" data-tab="billing" aria-selected="true" data-t="Billing">Billing</button>
+    <button class="tab" role="tab" data-tab="products" aria-selected="false" data-t="Bakery items">Bakery items</button>
+    <button class="tab owner-only" role="tab" data-tab="ingredients" aria-selected="false" data-t="Ingredients">Ingredients</button>
+    <button class="tab" role="tab" data-tab="bake" aria-selected="false" data-t="Bake">Bake</button>
+    <button class="tab" role="tab" data-tab="cakes" aria-selected="false" data-t="Cake orders">Cake orders</button>
+    <button class="tab owner-only" role="tab" data-tab="reports" aria-selected="false" data-t="Reports">Reports</button>
+    <button class="tab owner-only" role="tab" data-tab="history" aria-selected="false" data-t="Stock history">Stock history</button>
+    <button class="tab owner-only" role="tab" data-tab="sql" aria-selected="false" data-t="SQL console">SQL console</button>
   </nav>
 
   <div class="work">
     <main>
-      <!-- Ingredients -->
-      <section class="panel" data-panel="ingredients">
-        <div class="panel-head">
-          <div><h2>Ingredients</h2><p>Raw materials in the store room. Red bars are at or below their reorder level.</p></div>
+      <!-- Billing -->
+      <section class="panel" data-panel="billing">
+        <div class="pos">
+          <div class="panel">
+            <div class="scanrow">
+              <button class="btn primary" type="button" id="scanBtn" data-t="Scan barcode">Scan barcode</button>
+              <input id="codeInput" inputmode="numeric" data-tp="or type barcode number" placeholder="or type barcode number" aria-label="Barcode number">
+              <button class="btn" type="button" id="codeAdd" data-t="Add">Add</button>
+            </div>
+            <div class="tiles" id="tiles"></div>
+          </div>
+          <div class="card cart">
+            <h3 data-t="Current bill">Current bill</h3>
+            <div class="cart-lines" id="cartLines"></div>
+            <div class="field"><label for="custName" data-t="Customer name (optional)">Customer name (optional)</label><input id="custName" autocomplete="off"></div>
+            <div class="field"><label for="custPhone" data-t="WhatsApp number (optional)">WhatsApp number (optional)</label><input id="custPhone" inputmode="tel" autocomplete="off" placeholder="98765 43210"></div>
+            <div class="seg" id="paySeg">
+              <button type="button" data-pay="Cash" aria-pressed="false" data-t="Cash">Cash</button>
+              <button type="button" data-pay="UPI" aria-pressed="true">UPI</button>
+              <button type="button" data-pay="Card" aria-pressed="false" data-t="Card">Card</button>
+            </div>
+            <div class="totals">
+              <div class="grand"><span data-t="Total">Total</span><span class="num" id="cartTotal">₹0</span></div>
+              <div class="taxline"><span data-t="GST included">GST included</span><span class="num" id="cartTax">₹0</span></div>
+            </div>
+            <button class="btn primary big" type="button" id="checkoutBtn" data-t="Complete bill">Complete bill</button>
+            <button class="linkbtn" type="button" id="clearCart" data-t="Clear bill">Clear bill</button>
+          </div>
         </div>
-        <div class="table-wrap"><table class="cards">
-          <thead><tr><th>Ingredient</th><th class="r">In stock</th><th>Level</th><th class="r">Reorder at</th><th>Expiry</th><th>Status</th></tr></thead>
-          <tbody id="ingBody"></tbody>
-        </table></div>
-        <div class="card">
-          <h3>Receive stock from supplier</h3>
-          <form class="form" id="receiveForm">
-            <div class="field"><label for="rcvItem">Ingredient</label><select id="rcvItem"></select></div>
-            <div class="field"><label for="rcvQty">Quantity</label><input id="rcvQty" type="number" min="0.01" step="0.01" value="10" required></div>
-            <div class="field"><label for="rcvExp">New expiry date</label><input id="rcvExp" type="date" required></div>
-            <button class="btn primary" type="submit">Add to stock</button>
-          </form>
-        </div>
-        <details class="card">
-          <summary>Add a new ingredient</summary>
-          <form class="form" id="newIngForm">
-            <div class="field"><label for="niName">Name</label><input id="niName" required placeholder="e.g. Cashew nuts"></div>
-            <div class="field"><label for="niUnit">Unit</label><select id="niUnit"><option>kg</option><option>L</option><option>pcs</option><option>g</option></select></div>
-            <div class="field"><label for="niQty">Opening stock</label><input id="niQty" type="number" min="0" step="0.01" value="5" required></div>
-            <div class="field"><label for="niReorder">Reorder at</label><input id="niReorder" type="number" min="0" step="0.01" value="2" required></div>
-            <div class="field"><label for="niCost">Cost per unit (₹)</label><input id="niCost" type="number" min="0" step="0.5" value="900" required></div>
-            <div class="field"><label for="niExp">Expiry</label><input id="niExp" type="date" required></div>
-            <button class="btn primary" type="submit">Add ingredient</button>
-          </form>
-        </details>
       </section>
 
       <!-- Products -->
       <section class="panel" data-panel="products" hidden>
         <div class="panel-head">
-          <div><h2>Bakery items</h2><p>Finished goods on the counter. Sales take from the oldest batch first (FIFO).</p></div>
-          <button class="btn danger small" id="writeOffBtn" type="button">Remove expired stock</button>
+          <div><h2 data-t="Bakery items">Bakery items</h2><p data-t="Finished goods on the counter. Sales take from the oldest batch first (FIFO).">Finished goods on the counter. Sales take from the oldest batch first (FIFO).</p></div>
+          <button class="btn danger small" id="writeOffBtn" type="button" data-t="Remove expired stock">Remove expired stock</button>
         </div>
         <div class="table-wrap"><table class="cards">
-          <thead><tr><th>Item</th><th class="r">Price</th><th class="r">On counter</th><th>Batches (best before)</th><th>Status</th><th class="r">Sell</th></tr></thead>
+          <thead><tr><th data-t="Item">Item</th><th class="r" data-t="Price">Price</th><th class="r" data-t="On counter">On counter</th><th data-t="Batches (best before)">Batches (best before)</th><th data-t="Status">Status</th><th class="r" data-t="Quick sell">Quick sell</th></tr></thead>
           <tbody id="prodBody"></tbody>
         </table></div>
+      </section>
+
+      <!-- Ingredients -->
+      <section class="panel" data-panel="ingredients" hidden>
+        <div class="panel-head">
+          <div><h2 data-t="Ingredients">Ingredients</h2><p data-t="Raw materials in the store room. Red bars are at or below their reorder level.">Raw materials in the store room. Red bars are at or below their reorder level.</p></div>
+        </div>
+        <div class="card" id="poCard"></div>
+        <div class="table-wrap"><table class="cards">
+          <thead><tr><th data-t="Ingredient">Ingredient</th><th class="r" data-t="In stock">In stock</th><th data-t="Level">Level</th><th class="r" data-t="Reorder at">Reorder at</th><th data-t="Expiry">Expiry</th><th data-t="Status">Status</th></tr></thead>
+          <tbody id="ingBody"></tbody>
+        </table></div>
+        <div class="card">
+          <h3 data-t="Receive stock from supplier">Receive stock from supplier</h3>
+          <form class="form" id="receiveForm">
+            <div class="field"><label for="rcvItem" data-t="Ingredient">Ingredient</label><select id="rcvItem"></select></div>
+            <div class="field"><label for="rcvQty" data-t="Quantity">Quantity</label><input id="rcvQty" type="number" min="0.01" step="0.01" value="10" required></div>
+            <div class="field"><label for="rcvExp" data-t="New expiry date">New expiry date</label><input id="rcvExp" type="date" required></div>
+            <button class="btn primary" type="submit" data-t="Add to stock">Add to stock</button>
+          </form>
+        </div>
+        <details class="card">
+          <summary data-t="Add a new ingredient">Add a new ingredient</summary>
+          <form class="form" id="newIngForm">
+            <div class="field"><label for="niName" data-t="Name">Name</label><input id="niName" required placeholder="Cashew nuts"></div>
+            <div class="field"><label for="niUnit" data-t="Unit">Unit</label><select id="niUnit"><option>kg</option><option>L</option><option>pcs</option><option>g</option></select></div>
+            <div class="field"><label for="niQty" data-t="Opening stock">Opening stock</label><input id="niQty" type="number" min="0" step="0.01" value="5" required></div>
+            <div class="field"><label for="niReorder" data-t="Reorder at">Reorder at</label><input id="niReorder" type="number" min="0" step="0.01" value="2" required></div>
+            <div class="field"><label for="niCost" data-t="Cost per unit (₹)">Cost per unit (₹)</label><input id="niCost" type="number" min="0" step="0.5" value="900" required></div>
+            <div class="field"><label for="niSupplier" data-t="Supplier">Supplier</label><select id="niSupplier"></select></div>
+            <div class="field"><label for="niExp" data-t="Expiry">Expiry</label><input id="niExp" type="date" required></div>
+            <button class="btn primary" type="submit" data-t="Add ingredient">Add ingredient</button>
+          </form>
+        </details>
       </section>
 
       <!-- Bake -->
       <section class="panel" data-panel="bake" hidden>
         <div class="panel-head">
-          <div><h2>Bake a batch</h2><p>Baking uses the recipe to take ingredients out of stock and adds the finished items to the counter.</p></div>
+          <div><h2 data-t="Bake a batch">Bake a batch</h2><p data-t="Baking uses the recipe to take ingredients out of stock and adds the finished items to the counter.">Baking uses the recipe to take ingredients out of stock and adds the finished items to the counter.</p></div>
         </div>
         <div class="card">
           <form class="form" id="bakeForm">
-            <div class="field"><label for="bakeItem">What are you baking?</label><select id="bakeItem"></select></div>
-            <div class="field"><label for="bakeN">Number of batches</label><input id="bakeN" type="number" min="1" max="20" step="1" value="1" required></div>
-            <button class="btn primary" type="submit" id="bakeBtn">Bake</button>
+            <div class="field"><label for="bakeItem" data-t="What are you baking?">What are you baking?</label><select id="bakeItem"></select></div>
+            <div class="field"><label for="bakeN" data-t="Number of batches">Number of batches</label><input id="bakeN" type="number" min="1" max="20" step="1" value="1" required></div>
+            <button class="btn primary" type="submit" id="bakeBtn" data-t="Bake">Bake</button>
           </form>
-          <p class="muted" id="bakeYield" style="margin:0"></p>
+          <p class="muted" id="bakeYield"></p>
           <div class="need-list" id="needList"></div>
+        </div>
+        <div class="card">
+          <div><h3 data-t="Plan for tomorrow">Plan for tomorrow</h3><p class="muted" style="margin:2px 0 0;font-size:.85rem" data-t="Based on the average daily sales of the last 7 days, minus what is still fresh tomorrow.">Based on the average daily sales of the last 7 days, minus what is still fresh tomorrow.</p></div>
+          <div class="table-wrap"><table class="cards">
+            <thead><tr><th data-t="Item">Item</th><th class="r" data-t="Sells per day">Sells per day</th><th class="r" data-t="Fresh tomorrow">Fresh tomorrow</th><th class="r" data-t="To bake">To bake</th><th></th></tr></thead>
+            <tbody id="planBody"></tbody>
+          </table></div>
         </div>
       </section>
 
-      <!-- Sales -->
-      <section class="panel" data-panel="sales" hidden>
+      <!-- Cake orders -->
+      <section class="panel" data-panel="cakes" hidden>
         <div class="panel-head">
-          <div><h2>Today's sales</h2><p id="salesSummary"></p></div>
+          <div><h2 data-t="Cake orders">Cake orders</h2><p data-t="Custom cakes with delivery date, advance and balance.">Custom cakes with delivery date, advance and balance.</p></div>
         </div>
-        <div class="card"><h3>Revenue by item</h3><div class="sales-bars" id="salesBars"></div></div>
-        <div class="table-wrap"><table class="cards">
-          <thead><tr><th>Time</th><th>Item</th><th class="r">Qty</th><th class="r">Amount</th></tr></thead>
-          <tbody id="salesBody"></tbody>
-        </table></div>
+        <div class="orders" id="cakeList"></div>
+        <details class="card" id="cakeFormBox">
+          <summary data-t="New cake order">New cake order</summary>
+          <form class="form" id="cakeForm">
+            <div class="field"><label for="ckName" data-t="Customer name">Customer name</label><input id="ckName" required></div>
+            <div class="field"><label for="ckPhone" data-t="WhatsApp number">WhatsApp number</label><input id="ckPhone" inputmode="tel" required></div>
+            <div class="field"><label for="ckItem" data-t="Cake">Cake</label><input id="ckItem" required placeholder="Pineapple cake"></div>
+            <div class="field"><label for="ckKg" data-t="Weight (kg)">Weight (kg)</label><input id="ckKg" type="number" min="0.5" step="0.5" value="1" required></div>
+            <div class="field"><label for="ckText" data-t="Message on cake">Message on cake</label><input id="ckText" placeholder="Happy Birthday"></div>
+            <div class="field"><label for="ckDay" data-t="Delivery date">Delivery date</label><input id="ckDay" type="date" required></div>
+            <div class="field"><label for="ckTime" data-t="Time">Time</label><input id="ckTime" type="time" value="17:00" required></div>
+            <div class="field"><label for="ckAmt" data-t="Price (₹)">Price (₹)</label><input id="ckAmt" type="number" min="0" step="10" value="800" required></div>
+            <div class="field"><label for="ckAdv" data-t="Advance paid (₹)">Advance paid (₹)</label><input id="ckAdv" type="number" min="0" step="10" value="300" required></div>
+            <button class="btn primary" type="submit" data-t="Save order">Save order</button>
+          </form>
+        </details>
+        <details class="card">
+          <summary data-t="Delivered orders">Delivered orders</summary>
+          <div class="mini" id="cakeDone"></div>
+        </details>
+      </section>
+
+      <!-- Reports -->
+      <section class="panel" data-panel="reports" hidden>
+        <div class="card">
+          <div class="panel-head">
+            <div><h3 data-t="Daily closing report">Daily closing report</h3><p class="muted" style="margin:2px 0 0;font-size:.85rem" id="closingDate"></p></div>
+            <div class="acts" style="flex:0 0 auto"><a class="btn wa small" id="closingWa" target="_blank" rel="noopener" data-t="Send on WhatsApp">Send on WhatsApp</a><button class="btn small" type="button" id="closingShare" data-t="Share">Share</button></div>
+          </div>
+          <div class="kpis" id="closingKpis"></div>
+          <div class="two">
+            <div class="mini" id="closingPay"></div>
+            <div class="mini" id="closingTop"></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3 data-t="Sales, last 7 days">Sales, last 7 days</h3>
+          <div id="weekChart"></div>
+        </div>
+        <div class="card">
+          <div><h3 data-t="Profit per item">Profit per item</h3><p class="muted" style="margin:2px 0 0;font-size:.85rem" data-t="Ingredient cost from the recipe, compared with the price after GST. Labour, gas and fillings are not included.">Ingredient cost from the recipe, compared with the price after GST. Labour, gas and fillings are not included.</p></div>
+          <div class="table-wrap"><table class="cards">
+            <thead><tr><th data-t="Item">Item</th><th class="r" data-t="Price">Price</th><th class="r" data-t="After GST">After GST</th><th class="r" data-t="Ingredient cost">Ingredient cost</th><th class="r" data-t="Profit / pc">Profit / pc</th><th data-t="Margin">Margin</th></tr></thead>
+            <tbody id="profitBody"></tbody>
+          </table></div>
+        </div>
+        <div class="card">
+          <div><h3 data-t="Waste, last 7 days">Waste, last 7 days</h3><p class="muted" style="margin:2px 0 0;font-size:.85rem" data-t="Items thrown away after their best-before date, valued at selling price.">Items thrown away after their best-before date, valued at selling price.</p></div>
+          <div class="table-wrap"><table class="cards">
+            <thead><tr><th data-t="Item">Item</th><th class="r" data-t="Wasted">Wasted</th><th class="r" data-t="Sold">Sold</th><th class="r" data-t="Waste rate">Waste rate</th><th class="r" data-t="Loss">Loss</th></tr></thead>
+            <tbody id="wasteBody"></tbody>
+          </table></div>
+          <p class="muted" style="font-size:.85rem" id="wasteTip"></p>
+        </div>
+        <p class="muted" style="font-size:.8rem;margin:0" data-t="GST rates in this demo are examples. Confirm the rates for each item with your accountant.">GST rates in this demo are examples. Confirm the rates for each item with your accountant.</p>
       </section>
 
       <!-- History -->
       <section class="panel" data-panel="history" hidden>
         <div class="panel-head">
-          <div><h2>Stock history</h2><p>Every change to stock is written to a movements table, so nothing goes missing without a record.</p></div>
+          <div><h2 data-t="Stock history">Stock history</h2><p data-t="Every change to stock is written to a movements table, so nothing goes missing without a record.">Every change to stock is written to a movements table, so nothing goes missing without a record.</p></div>
         </div>
         <div class="table-wrap"><table class="cards">
-          <thead><tr><th>When</th><th>Item</th><th>Type</th><th class="r">Change</th><th>Note</th></tr></thead>
+          <thead><tr><th data-t="When">When</th><th data-t="Item">Item</th><th data-t="Type">Type</th><th class="r" data-t="Change">Change</th><th data-t="Note">Note</th></tr></thead>
           <tbody id="histBody"></tbody>
         </table></div>
       </section>
@@ -278,89 +479,70 @@ footer{font-size:.8rem;color:var(--muted)}
       <!-- SQL console -->
       <section class="panel console" data-panel="sql" hidden>
         <div class="panel-head">
-          <div><h2>SQL console</h2><p>Ask the database anything. Pick an example or write your own query.</p></div>
+          <div><h2 data-t="SQL console">SQL console</h2><p data-t="Ask the database anything. Pick an example or write your own query.">Ask the database anything. Pick an example or write your own query.</p></div>
         </div>
         <div class="chips" id="chips"></div>
-        <label for="sqlInput" class="muted" style="font-size:.8rem">Query</label>
+        <label for="sqlInput" class="muted" style="font-size:.8rem">SQL</label>
         <textarea id="sqlInput" spellcheck="false"></textarea>
-        <div><button class="btn primary" id="runSql" type="button">Run query</button></div>
+        <div><button class="btn primary" id="runSql" type="button" data-t="Run query">Run query</button></div>
         <p class="err" id="sqlErr" hidden></p>
         <div class="table-wrap" id="sqlResult"></div>
         <details class="card schema">
-          <summary>Database tables (schema)</summary>
+          <summary data-t="Database tables (schema)">Database tables (schema)</summary>
           <pre id="schemaText"></pre>
         </details>
       </section>
     </main>
 
-    <aside class="sqlbox" aria-label="SQL log">
-      <h3>SQL that just ran <button class="btn small" id="clearLog" type="button" style="background:transparent;color:inherit;border-color:rgba(255,255,255,.2)">Clear</button></h3>
-      <p class="hint">Sell, bake or receive something. The real SQL statements the app sends to the database show up here.</p>
-      <div class="log" id="log"><p class="empty-log">Nothing yet. Try selling a Veg puff.</p></div>
+    <aside class="sqlbox owner-only" aria-label="SQL log">
+      <h3><span data-t="SQL that just ran">SQL that just ran</span> <button class="btn small" id="clearLog" type="button" style="background:transparent;color:inherit;border-color:rgba(255,255,255,.2)" data-t="Clear">Clear</button></h3>
+      <p class="hint" data-t="Make a bill, bake or receive stock. The real SQL statements the app sends to the database show up here.">Make a bill, bake or receive stock. The real SQL statements the app sends to the database show up here.</p>
+      <div class="log" id="log"></div>
     </aside>
   </div>
 
-  <footer id="footNote">Demo data only. Prices in ₹. In this demo the database lives in your browser and resets when you reload; the real system would use a shared MySQL or PostgreSQL server.</footer>
+  <footer id="footNote">Demo data only. Prices in ₹. In this web demo the database lives in your browser and resets when you reload. The Android app saves data on the phone.</footer>
 </div>
 
+<div class="modal-back" id="modalBack" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head"><h3 id="modalTitle"></h3><button class="x" type="button" id="modalClose" aria-label="Close">×</button></div>
+    <div id="modalBody" style="display:grid;gap:12px"></div>
+  </div>
+</div>
 <div class="toast" id="toast" hidden></div>
 
 <script src="alasql.min.js"></script>
+<script src="zxing.min.js"></script>
+<script src="JsBarcode.all.min.js"></script>
 <script>
-(function(){
-const $ = s => document.querySelector(s);
-const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const pad = n => String(n).padStart(2,'0');
-const isoDay = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-const dayOffset = n => { const d = new Date(); d.setDate(d.getDate()+n); return isoDay(d); };
+/* Noor Bakery – data layer. Every read and write goes through SQL (AlaSQL). */
+(function (root) {
+const pad = n => String(n).padStart(2, '0');
+const isoDay = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const dayOffset = n => { const d = new Date(); d.setDate(d.getDate() + n); return isoDay(d); };
 const TODAY = dayOffset(0);
 const nowTime = () => { const d = new Date(); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
-const rupee = v => '₹' + Math.round(v).toLocaleString('en-IN');
-const qtyFmt = (v, unit) => { const n = Math.round(v*1000)/1000; return (unit==='pcs' ? Math.round(n) : n.toLocaleString('en-IN',{maximumFractionDigits:2})) + ' ' + unit; };
-const daysUntil = iso => Math.round((new Date(iso+'T00:00:00') - new Date(TODAY+'T00:00:00'))/86400000);
-const niceDate = iso => new Date(iso+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'});
-const r3 = v => Math.round(v*1000)/1000;
+const r2 = v => Math.round(v * 100) / 100;
+const r3 = v => Math.round(v * 1000) / 1000;
 
-let db; const LOG = []; let freshCount = 0;
-const IN_APP = location.protocol === 'file:';   // Android app: keep data on the phone
-const STORE_KEY = 'noor-bakery-db-v1';
-const TABLES = ['ingredients','products','recipes','batches','sales','movements'];
-function saveDb(){
-  if (!IN_APP) return;
-  try{ const data = {}; TABLES.forEach(t => data[t] = db.exec(`SELECT * FROM ${t}`)); localStorage.setItem(STORE_KEY, JSON.stringify(data)); }catch(e){}
-}
-function loadDb(){
-  if (!IN_APP) return false;
-  try{
-    const raw = localStorage.getItem(STORE_KEY); if (!raw) return false;
-    const data = JSON.parse(raw);
-    db = new alasql.Database();
-    SCHEMA.split(';').map(s=>s.trim()).filter(Boolean).forEach(s => db.exec(s));
-    TABLES.forEach(t => { if (data[t] && data[t].length) db.exec(`INSERT INTO ${t} SELECT * FROM ?`, [data[t]]); });
-    return true;
-  }catch(e){ return false; }
+function ean13(body12) {
+  let s = 0;
+  for (let i = 0; i < 12; i++) s += (+body12[i]) * (i % 2 ? 3 : 1);
+  return body12 + ((10 - (s % 10)) % 10);
 }
 
-function fmtSql(sql, params){
-  let i = 0;
-  return sql.trim().replace(/\s+/g,' ').replace(/\?/g, () => {
-    const v = params[i++]; return typeof v === 'string' ? `'${v.replace(/'/g,"''")}'` : String(v);
-  });
-}
-function q(sql, params = [], log = false){
-  if (log){ LOG.unshift(fmtSql(sql, params)); freshCount++; if (LOG.length > 40) LOG.length = 40; }
-  return db.exec(sql, params);
-}
-const w = (sql, params) => q(sql, params, true);  // write + log
-function nextId(t){ const r = q(`SELECT MAX(id) AS m FROM ${t}`); return (r[0] && r[0].m ? r[0].m : 0) + 1; }
+const SCHEMA = `CREATE TABLE suppliers (
+  id INT, name TEXT, phone TEXT);
 
-const SCHEMA = `CREATE TABLE ingredients (
-  id INT, name TEXT, unit TEXT, qty REAL,
+CREATE TABLE ingredients (
+  id INT, name TEXT, name_ta TEXT, unit TEXT, qty REAL,
   reorder_level REAL, cost REAL, expiry TEXT, supplier TEXT);
 
 CREATE TABLE products (
-  id INT, name TEXT, category TEXT, price REAL,
-  shelf_days INT, batch_yield INT, reorder_level INT);
+  id INT, name TEXT, name_ta TEXT, category TEXT, price REAL,
+  gst_rate REAL, shelf_days INT, batch_yield INT,
+  reorder_level INT, barcode TEXT);
 
 CREATE TABLE recipes (
   product_id INT, ingredient_id INT, qty REAL);
@@ -368,48 +550,92 @@ CREATE TABLE recipes (
 CREATE TABLE batches (
   id INT, product_id INT, qty INT, made_on TEXT, best_before TEXT);
 
+CREATE TABLE bills (
+  id INT, bill_no TEXT, day TEXT, time TEXT, customer TEXT,
+  phone TEXT, payment TEXT, amount REAL, tax REAL, staff TEXT);
+
 CREATE TABLE sales (
-  id INT, day TEXT, time TEXT, product_id INT, qty INT, amount REAL);
+  id INT, bill_id INT, day TEXT, time TEXT,
+  product_id INT, qty INT, amount REAL);
 
 CREATE TABLE movements (
   id INT, day TEXT, time TEXT, item TEXT, kind TEXT,
-  delta REAL, unit TEXT, note TEXT);`;
+  delta REAL, unit TEXT, note TEXT);
 
-function seed(){
-  db = new alasql.Database();
-  SCHEMA.split(';').map(s=>s.trim()).filter(Boolean).forEach(s => q(s));
-  const ing = [
-    [1,'Maida (all-purpose flour)','kg',42,20,38,dayOffset(60),'Sri Lakshmi Traders'],
-    [2,'Sugar','kg',18,10,44,dayOffset(180),'Sri Lakshmi Traders'],
-    [3,'Butter','kg',2.5,5,520,dayOffset(12),'Aavin Dairy'],
-    [4,'Eggs','pcs',90,60,6.5,dayOffset(6),'Kumar Poultry'],
-    [5,'Milk','L',6,8,56,dayOffset(2),'Aavin Dairy'],
-    [6,'Instant yeast','kg',0.8,0.5,420,dayOffset(90),'Bake Supply Co.'],
-    [7,'Cocoa powder','kg',1.2,1,650,dayOffset(120),'Bake Supply Co.'],
-    [8,'Fresh cream','L',3,2,240,dayOffset(3),'Aavin Dairy'],
-    [9,'Salt','kg',5,1,28,dayOffset(365),'Sri Lakshmi Traders'],
-    [10,'Cooking oil','L',10,5,150,dayOffset(150),'Sri Lakshmi Traders'],
-  ];
-  ing.forEach(r => q('INSERT INTO ingredients VALUES (?,?,?,?,?,?,?,?)', r));
-  const prods = [
-    [1,'Sandwich bread 400 g','Bread',45,3,12,10],
-    [2,'Butter bun','Bread',15,2,24,20],
-    [3,'Veg puff','Snacks',20,1,30,15],
-    [4,'Chocolate pastry','Cakes',60,2,16,8],
-    [5,'Plum cake 500 g','Cakes',180,10,8,4],
-    [6,'Coconut biscuits 250 g','Biscuits',70,20,20,10],
-  ];
-  prods.forEach(r => q('INSERT INTO products VALUES (?,?,?,?,?,?,?)', r));
+CREATE TABLE purchase_orders (
+  id INT, day TEXT, supplier TEXT, items TEXT, status TEXT);
+
+CREATE TABLE cake_orders (
+  id INT, customer TEXT, phone TEXT, item TEXT, weight_kg REAL,
+  cake_text TEXT, due_day TEXT, due_time TEXT, amount REAL,
+  advance REAL, status TEXT, created_day TEXT);`;
+
+const TABLES = ['suppliers','ingredients','products','recipes','batches','bills','sales','movements','purchase_orders','cake_orders'];
+
+let db;
+const LOG = [];
+let onLog = null;
+
+function fmtSql(sql, params) {
+  let i = 0;
+  return sql.trim().replace(/\s+/g, ' ').replace(/\?/g, () => {
+    const v = params[i++];
+    return typeof v === 'string' ? `'${v.replace(/'/g, "''")}'` : String(v);
+  });
+}
+function q(sql, params = [], log = false) {
+  if (log) { LOG.unshift(fmtSql(sql, params)); if (LOG.length > 60) LOG.length = 60; if (onLog) onLog(); }
+  return db.exec(sql, params);
+}
+const w = (sql, params) => q(sql, params, true);
+function nextId(t) { const r = q(`SELECT MAX(id) AS m FROM ${t}`); return (r[0] && r[0].m ? r[0].m : 0) + 1; }
+function createSchema() {
+  db = new root.alasql.Database();
+  SCHEMA.split(';').map(s => s.trim()).filter(Boolean).forEach(s => db.exec(s));
+}
+
+/* ---------------- seed ---------------- */
+function seed() {
+  createSchema();
+  let rs = 20261003;
+  const rnd = () => (rs = (rs * 1664525 + 1013904223) % 4294967296) / 4294967296;
+
+  [[1,'Sri Lakshmi Traders','9840012345'],[2,'Annai Dairy','9840023456'],[3,'Kumar Poultry','9840034567'],[4,'Bake Supply Co.','9840045678']]
+    .forEach(r => q('INSERT INTO suppliers VALUES (?,?,?)', r));
+
+  [
+    [1,'Maida (all-purpose flour)','மைதா','kg',42,20,38,dayOffset(60),'Sri Lakshmi Traders'],
+    [2,'Sugar','சர்க்கரை','kg',18,10,44,dayOffset(180),'Sri Lakshmi Traders'],
+    [3,'Butter','வெண்ணெய்','kg',2.5,5,520,dayOffset(12),'Annai Dairy'],
+    [4,'Eggs','முட்டை','pcs',90,60,6.5,dayOffset(6),'Kumar Poultry'],
+    [5,'Milk','பால்','L',6,8,56,dayOffset(2),'Annai Dairy'],
+    [6,'Instant yeast','ஈஸ்ட்','kg',0.8,0.5,420,dayOffset(90),'Bake Supply Co.'],
+    [7,'Cocoa powder','கோகோ பவுடர்','kg',1.2,1,650,dayOffset(120),'Bake Supply Co.'],
+    [8,'Fresh cream','ஃப்ரெஷ் கிரீம்','L',3,2,240,dayOffset(3),'Annai Dairy'],
+    [9,'Salt','உப்பு','kg',5,1,28,dayOffset(365),'Sri Lakshmi Traders'],
+    [10,'Cooking oil','சமையல் எண்ணெய்','L',10,5,150,dayOffset(150),'Sri Lakshmi Traders'],
+  ].forEach(r => q('INSERT INTO ingredients VALUES (?,?,?,?,?,?,?,?,?)', r));
+
+  [
+    [1,'Sandwich bread 400 g','சாண்ட்விச் பிரெட் 400 கி','Bread',45,0,3,12,10,ean13('890123400001')],
+    [2,'Butter bun','பட்டர் பன்','Bread',15,5,2,50,20,ean13('890123400002')],
+    [3,'Veg puff','வெஜ் பஃப்','Snacks',20,5,1,60,15,ean13('890123400003')],
+    [4,'Chocolate pastry','சாக்லேட் பேஸ்ட்ரி','Cakes',60,5,2,16,8,ean13('890123400004')],
+    [5,'Plum cake 500 g','பிளம் கேக் 500 கி','Cakes',180,5,10,8,4,ean13('890123400005')],
+    [6,'Coconut biscuits 250 g','தேங்காய் பிஸ்கட் 250 கி','Biscuits',70,5,20,20,10,ean13('890123400006')],
+  ].forEach(r => q('INSERT INTO products VALUES (?,?,?,?,?,?,?,?,?,?)', r));
+
   const rec = {
-    1:[[1,6],[2,0.3],[6,0.1],[9,0.1],[10,0.3],[5,1]],
-    2:[[1,3],[2,0.6],[3,0.4],[6,0.06],[5,1.2],[4,4]],
-    3:[[1,2.5],[3,1.2],[9,0.05],[10,0.3]],
-    4:[[1,1],[2,1],[4,12],[7,0.3],[8,1.5],[10,0.4]],
-    5:[[1,1.6],[2,1.2],[3,1],[4,16]],
-    6:[[1,2],[2,1.2],[3,1],[9,0.02]],
+    1: [[1,6],[2,0.3],[6,0.1],[9,0.1],[10,0.3],[5,1]],
+    2: [[1,3],[2,0.6],[3,0.4],[6,0.06],[5,1.2],[4,4]],
+    3: [[1,2.5],[3,0.8],[9,0.05],[10,0.3]],
+    4: [[1,1],[2,1],[4,12],[7,0.3],[8,1.5],[10,0.4]],
+    5: [[1,1.6],[2,1.2],[3,1],[4,16]],
+    6: [[1,2],[2,1.2],[3,1],[9,0.02]],
   };
-  Object.entries(rec).forEach(([p,list]) => list.forEach(([i,qt]) => q('INSERT INTO recipes VALUES (?,?,?)',[+p,i,qt])));
-  const batches = [
+  Object.entries(rec).forEach(([p, list]) => list.forEach(([i, qt]) => q('INSERT INTO recipes VALUES (?,?,?)', [+p, i, qt])));
+
+  [
     [1,1,4,dayOffset(-2),dayOffset(1)],
     [2,1,10,TODAY,dayOffset(3)],
     [3,2,4,dayOffset(-3),dayOffset(-1)],
@@ -418,285 +644,861 @@ function seed(){
     [6,4,10,TODAY,dayOffset(2)],
     [7,5,6,dayOffset(-2),dayOffset(8)],
     [8,6,22,dayOffset(-5),dayOffset(15)],
-  ];
-  batches.forEach(r => q('INSERT INTO batches VALUES (?,?,?,?,?)', r));
-  const sales = [[1,'08:12',1,6,270],[2,'08:40',2,12,180],[3,'09:05',3,7,140],[4,'10:22',4,4,240],[5,'11:47',6,3,210]];
-  sales.forEach(([id,t,p,n,a]) => q('INSERT INTO sales VALUES (?,?,?,?,?,?)',[id,TODAY,t,p,n,a]));
+  ].forEach(r => q('INSERT INTO batches VALUES (?,?,?,?,?)', r));
+
+  // Sales history: last 7 days + this morning
+  const prods = q('SELECT * FROM products ORDER BY id');
+  const base = {1:18, 2:40, 3:30, 4:12, 5:3, 6:8};
+  const pays = () => { const x = rnd(); return x < 0.55 ? 'UPI' : x < 0.92 ? 'Cash' : 'Card'; };
+  let billId = 0, saleId = 0;
+  const addBill = (day, time, lines, payment, staff) => {
+    billId++;
+    let amt = 0, tax = 0;
+    lines.forEach(([pid, n]) => {
+      const p = prods[pid - 1]; const a = n * p.price;
+      amt += a; tax += a * p.gst_rate / (100 + p.gst_rate);
+      q('INSERT INTO sales VALUES (?,?,?,?,?,?,?)', [++saleId, billId, day, time, pid, n, a]);
+    });
+    q('INSERT INTO bills VALUES (?,?,?,?,?,?,?,?,?,?)', [billId, 'NB-' + String(billId).padStart(4, '0'), day, time, '', '', payment, amt, r2(tax), staff]);
+  };
+  for (let d = -7; d <= -1; d++) {
+    const day = dayOffset(d);
+    const wd = new Date(day + 'T00:00:00').getDay();
+    const factor = (wd === 0 || wd === 6) ? 1.3 : 1;
+    const lines = [];
+    prods.forEach(p => {
+      let n = Math.round(base[p.id] * factor * (0.75 + 0.5 * rnd()));
+      while (n > 0) { const take = Math.min(n, 1 + Math.floor(rnd() * 4)); lines.push([p.id, take]); n -= take; }
+    });
+    for (let i = lines.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [lines[i], lines[j]] = [lines[j], lines[i]]; }
+    let minute = 7 * 60;
+    for (let i = 0; i < lines.length;) {
+      const k = rnd() < 0.35 ? 2 : 1;
+      const group = [];
+      lines.slice(i, i + k).forEach(l => { const ex = group.find(g => g[0] === l[0]); ex ? ex[1] += l[1] : group.push([...l]); });
+      i += k;
+      minute = Math.min(21 * 60 + 30, minute + 8 + Math.floor(rnd() * 14));
+      addBill(day, `${pad(Math.floor(minute / 60))}:${pad(minute % 60)}`, group, pays(), rnd() < 0.6 ? 'Staff' : 'Owner');
+    }
+  }
+  [['07:52',[[1,2],[2,4]],'UPI'],['08:12',[[1,4]],'Cash'],['08:40',[[2,8],[3,2]],'UPI'],['09:05',[[3,5]],'Cash'],['10:22',[[4,4]],'UPI'],['11:47',[[6,3]],'Card']]
+    .forEach(([t, lines, pay]) => addBill(TODAY, t, lines, pay, 'Staff'));
+
+  // Stock movements (recent)
   const mv = [
-    [1,dayOffset(-1),'17:30','Maida (all-purpose flour)','in',50,'kg','Received from Sri Lakshmi Traders'],
-    [2,TODAY,'05:10','Sandwich bread 400 g','bake',10,'pcs','Baked fresh batch'],
-    [3,TODAY,'05:40','Butter bun','bake',26,'pcs','Baked fresh batch'],
-    [4,TODAY,'06:15','Chocolate pastry','bake',10,'pcs','Baked fresh batch'],
+    [dayOffset(-6),'21:30','Veg puff','waste',-6,'pcs','Expired, removed from counter'],
+    [dayOffset(-5),'21:30','Butter bun','waste',-5,'pcs','Expired, removed from counter'],
+    [dayOffset(-4),'21:30','Veg puff','waste',-4,'pcs','Expired, removed from counter'],
+    [dayOffset(-3),'21:30','Chocolate pastry','waste',-3,'pcs','Expired, removed from counter'],
+    [dayOffset(-2),'21:30','Veg puff','waste',-7,'pcs','Expired, removed from counter'],
+    [dayOffset(-1),'17:30','Maida (all-purpose flour)','in',50,'kg','Received from Sri Lakshmi Traders'],
+    [dayOffset(-1),'21:30','Sandwich bread 400 g','waste',-2,'pcs','Expired, removed from counter'],
+    [TODAY,'05:10','Sandwich bread 400 g','bake',10,'pcs','Baked fresh batch'],
+    [TODAY,'05:40','Butter bun','bake',26,'pcs','Baked fresh batch'],
+    [TODAY,'06:15','Chocolate pastry','bake',10,'pcs','Baked fresh batch'],
   ];
-  mv.forEach(r => q('INSERT INTO movements VALUES (?,?,?,?,?,?,?,?)', r));
-  [[5,'08:12',1,6],[6,'08:40',2,12],[7,'09:05',3,7],[8,'10:22',4,4],[9,'11:47',6,3]].forEach(([id,t,p,n]) => {
-    const name = q('SELECT name FROM products WHERE id = ?',[p])[0].name;
-    q('INSERT INTO movements VALUES (?,?,?,?,?,?,?,?)',[id,TODAY,t,name,'sale',-n,'pcs','Counter sale']);
-  });
+  mv.forEach((r, i) => q('INSERT INTO movements VALUES (?,?,?,?,?,?,?,?)', [i + 1, ...r]));
+  q(`SELECT s.time, p.name, s.qty FROM sales s JOIN products p ON s.product_id = p.id WHERE s.day = ? ORDER BY s.id`, [TODAY]).forEach(r =>
+    q('INSERT INTO movements VALUES (?,?,?,?,?,?,?,?)', [nextId('movements'), TODAY, r.time, r.name, 'sale', -r.qty, 'pcs', 'Counter sale']));
+
+  [
+    [1,'Priya S.','9876500011','Chocolate truffle cake',1,'Happy Birthday Anu',TODAY,'18:00',950,400,'pending',dayOffset(-2)],
+    [2,'Rahul K.','9876500022','Black forest cake',2,'Happy Anniversary',dayOffset(1),'11:00',1600,500,'pending',dayOffset(-1)],
+    [3,'Fathima B.','9876500033','Eggless vanilla cake',1.5,'Congrats Imran',dayOffset(3),'16:30',1200,0,'pending',TODAY],
+  ].forEach(r => q('INSERT INTO cake_orders VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', r));
 }
 
-function move(item, kind, delta, unit, note){
-  w('INSERT INTO movements VALUES (?,?,?,?,?,?,?,?)',[nextId('movements'),TODAY,nowTime(),item,kind,r3(delta),unit,note]);
+function move(item, kind, delta, unit, note) {
+  w('INSERT INTO movements VALUES (?,?,?,?,?,?,?,?)', [nextId('movements'), TODAY, nowTime(), item, kind, r3(delta), unit, note]);
 }
 
-/* ---------- actions ---------- */
-function receive(id, qty, expiry){
-  const ing = q('SELECT * FROM ingredients WHERE id = ?',[id])[0];
-  w('UPDATE ingredients SET qty = ROUND(qty + ?, 3), expiry = ? WHERE id = ?',[qty, expiry, id]);
-  move(ing.name,'in',qty,ing.unit,'Received from '+ing.supplier);
-  toast(`Added ${qtyFmt(qty, ing.unit)} of ${ing.name}`);
+/* ---------------- stock ---------------- */
+function receive(id, qty, expiry, note) {
+  const ing = q('SELECT * FROM ingredients WHERE id = ?', [id])[0];
+  w('UPDATE ingredients SET qty = ROUND(qty + ?, 3), expiry = ? WHERE id = ?', [qty, expiry, id]);
+  move(ing.name, 'in', qty, ing.unit, note || 'Received from ' + ing.supplier);
+  return ing;
 }
-function addIngredient(d){
+function addIngredient(d) {
   const id = nextId('ingredients');
-  w('INSERT INTO ingredients VALUES (?,?,?,?,?,?,?,?)',[id,d.name,d.unit,d.qty,d.reorder,d.cost,d.expiry,'New supplier']);
-  move(d.name,'in',d.qty,d.unit,'Opening stock');
-  toast(`${d.name} added to ingredients`);
+  w('INSERT INTO ingredients VALUES (?,?,?,?,?,?,?,?,?)', [id, d.name, '', d.unit, d.qty, d.reorder, d.cost, d.expiry, d.supplier || 'Sri Lakshmi Traders']);
+  move(d.name, 'in', d.qty, d.unit, 'Opening stock');
 }
-function recipeNeeds(pid, n){
-  return q(`SELECT r.ingredient_id, i.name, i.unit, r.qty * ? AS need, i.qty AS have
+function recipeNeeds(pid, n) {
+  return q(`SELECT r.ingredient_id, i.name, i.name_ta, i.unit, r.qty * ? AS need, i.qty AS have
             FROM recipes r JOIN ingredients i ON r.ingredient_id = i.id
-            WHERE r.product_id = ?`,[n,pid]);
+            WHERE r.product_id = ?`, [n, pid]);
 }
-function bake(pid, n){
-  const p = q('SELECT * FROM products WHERE id = ?',[pid])[0];
+function bake(pid, n) {
+  const p = q('SELECT * FROM products WHERE id = ?', [pid])[0];
   const needs = recipeNeeds(pid, n);
   const short = needs.filter(x => x.need > x.have + 1e-9);
-  if (short.length){ toast(`Not enough ${short.map(s=>s.name).join(', ')}`); return; }
-  q(`SELECT r.ingredient_id, i.name, r.qty * ? AS need, i.qty AS have FROM recipes r JOIN ingredients i ON r.ingredient_id = i.id WHERE r.product_id = ?`,[n,pid], true);
-  needs.forEach(x => {
-    w('UPDATE ingredients SET qty = ROUND(qty - ?, 3) WHERE id = ?',[r3(x.need), x.ingredient_id]);
-  });
+  if (short.length) return { ok: false, short };
+  q(`SELECT r.ingredient_id, i.name, r.qty * ? AS need, i.qty AS have FROM recipes r JOIN ingredients i ON r.ingredient_id = i.id WHERE r.product_id = ?`, [n, pid], true);
+  needs.forEach(x => w('UPDATE ingredients SET qty = ROUND(qty - ?, 3) WHERE id = ?', [r3(x.need), x.ingredient_id]));
   const made = p.batch_yield * n;
-  w('INSERT INTO batches VALUES (?,?,?,?,?)',[nextId('batches'),pid,made,TODAY,dayOffset(p.shelf_days)]);
-  move(p.name,'bake',made,'pcs',`Baked ${n} batch${n>1?'es':''}, used ${needs.length} ingredients`);
-  toast(`Baked ${made} × ${p.name}`);
+  w('INSERT INTO batches VALUES (?,?,?,?,?)', [nextId('batches'), pid, made, TODAY, dayOffset(p.shelf_days)]);
+  move(p.name, 'bake', made, 'pcs', `Baked ${n} batch${n > 1 ? 'es' : ''}`);
+  return { ok: true, made, product: p };
 }
-function sell(pid, n){
-  const p = q('SELECT * FROM products WHERE id = ?',[pid])[0];
-  const avail = q('SELECT SUM(qty) AS s FROM batches WHERE product_id = ? AND best_before >= ?',[pid,TODAY])[0].s || 0;
-  if (n > avail){ toast(avail ? `Only ${avail} fresh ${p.name} left` : `No fresh ${p.name} left. Bake a batch first.`); return; }
-  const list = q('SELECT * FROM batches WHERE product_id = ? AND best_before >= ? AND qty > 0 ORDER BY best_before, made_on',[pid,TODAY], true);
-  let left = n;
-  for (const b of list){
-    if (!left) break;
-    const take = Math.min(left, b.qty);
-    if (take === b.qty) w('DELETE FROM batches WHERE id = ?',[b.id]);
-    else w('UPDATE batches SET qty = qty - ? WHERE id = ?',[take,b.id]);
-    left -= take;
-  }
-  const amt = n * p.price;
-  w('INSERT INTO sales VALUES (?,?,?,?,?,?)',[nextId('sales'),TODAY,nowTime(),pid,n,amt]);
-  move(p.name,'sale',-n,'pcs','Counter sale');
-  toast(`Sold ${n} × ${p.name} · ${rupee(amt)}`);
+function freshStock(pid) {
+  return q('SELECT SUM(qty) AS s FROM batches WHERE product_id = ? AND best_before >= ?', [pid, TODAY])[0].s || 0;
 }
-function writeOff(){
-  const exp = q(`SELECT b.id, b.qty, p.name, p.price FROM batches b JOIN products p ON b.product_id = p.id WHERE b.best_before < ?`,[TODAY], true);
-  if (!exp.length){ toast('No expired stock on the counter'); return; }
-  w('DELETE FROM batches WHERE best_before < ?',[TODAY]);
-  let loss = 0;
-  exp.forEach(e => { loss += e.qty*e.price; move(e.name,'waste',-e.qty,'pcs','Expired, removed from counter'); });
-  toast(`Removed ${exp.reduce((a,e)=>a+e.qty,0)} expired items (${rupee(loss)} at sale price)`);
+function writeOff() {
+  const exp = q(`SELECT b.id, b.qty, p.name, p.price FROM batches b JOIN products p ON b.product_id = p.id WHERE b.best_before < ?`, [TODAY], true);
+  if (!exp.length) return { count: 0, loss: 0 };
+  w('DELETE FROM batches WHERE best_before < ?', [TODAY]);
+  let loss = 0, count = 0;
+  exp.forEach(e => { loss += e.qty * e.price; count += e.qty; move(e.name, 'waste', -e.qty, 'pcs', 'Expired, removed from counter'); });
+  return { count, loss };
 }
 
-/* ---------- rendering ---------- */
-function pill(cls, text){ return `<span class="pill ${cls}">${esc(text)}</span>`; }
+/* ---------------- billing ---------------- */
+function checkout(cart, info) {
+  const lines = cart.filter(l => l.qty > 0);
+  if (!lines.length) return { ok: false, error: 'empty' };
+  for (const l of lines) {
+    const have = freshStock(l.pid);
+    if (l.qty > have) {
+      const p = q('SELECT name FROM products WHERE id = ?', [l.pid])[0];
+      return { ok: false, error: 'stock', name: p.name, have };
+    }
+  }
+  const billId = nextId('bills');
+  const billNo = 'NB-' + String(billId).padStart(4, '0');
+  const time = nowTime();
+  let amount = 0, tax = 0;
+  const items = [];
+  for (const l of lines) {
+    const p = q('SELECT * FROM products WHERE id = ?', [l.pid])[0];
+    const list = q('SELECT * FROM batches WHERE product_id = ? AND best_before >= ? AND qty > 0 ORDER BY best_before, made_on', [l.pid, TODAY], true);
+    let left = l.qty;
+    for (const b of list) {
+      if (!left) break;
+      const take = Math.min(left, b.qty);
+      if (take === b.qty) w('DELETE FROM batches WHERE id = ?', [b.id]);
+      else w('UPDATE batches SET qty = qty - ? WHERE id = ?', [take, b.id]);
+      left -= take;
+    }
+    const a = l.qty * p.price;
+    const tx = a * p.gst_rate / (100 + p.gst_rate);
+    amount += a; tax += tx;
+    w('INSERT INTO sales VALUES (?,?,?,?,?,?,?)', [nextId('sales'), billId, TODAY, time, p.id, l.qty, a]);
+    move(p.name, 'sale', -l.qty, 'pcs', 'Bill ' + billNo);
+    items.push({ pid: p.id, name: p.name, name_ta: p.name_ta, qty: l.qty, price: p.price, amount: a, gst_rate: p.gst_rate, tax: tx });
+  }
+  w('INSERT INTO bills VALUES (?,?,?,?,?,?,?,?,?,?)', [billId, billNo, TODAY, time, info.customer || '', info.phone || '', info.payment || 'Cash', amount, r2(tax), info.staff || 'Owner']);
+  return { ok: true, bill: { id: billId, bill_no: billNo, day: TODAY, time, customer: info.customer || '', phone: info.phone || '', payment: info.payment || 'Cash', amount, tax: r2(tax), items } };
+}
+function productByBarcode(code) {
+  return q('SELECT * FROM products WHERE barcode = ?', [String(code).trim()])[0] || null;
+}
+
+/* ---------------- purchase orders ---------------- */
+function suggestQty(i) {
+  let need = i.reorder_level * 2 - i.qty;
+  if (i.unit === 'pcs') return Math.max(30, Math.ceil(need / 30) * 30);
+  return Math.max(1, Math.ceil(need));
+}
+function reorderPlan() {
+  const low = q(`SELECT i.id, i.name, i.unit, i.qty, i.reorder_level, i.cost, i.supplier, s.phone
+                 FROM ingredients i JOIN suppliers s ON i.supplier = s.name
+                 WHERE i.qty <= i.reorder_level ORDER BY i.supplier, i.name`);
+  const by = {};
+  low.forEach(i => {
+    (by[i.supplier] = by[i.supplier] || { supplier: i.supplier, phone: i.phone, items: [] })
+      .items.push({ id: i.id, name: i.name, unit: i.unit, qty: suggestQty(i), cost: i.cost });
+  });
+  return Object.values(by);
+}
+function createPO(plan) {
+  const id = nextId('purchase_orders');
+  w('INSERT INTO purchase_orders VALUES (?,?,?,?,?)', [id, TODAY, plan.supplier, JSON.stringify(plan.items), 'sent']);
+  return id;
+}
+function receivePO(id) {
+  const po = q('SELECT * FROM purchase_orders WHERE id = ?', [id])[0];
+  if (!po || po.status !== 'sent') return null;
+  JSON.parse(po.items).forEach(it => {
+    const ing = q('SELECT * FROM ingredients WHERE id = ?', [it.id])[0];
+    const keep = ing.expiry > TODAY ? ing.expiry : dayOffset(30);
+    receive(it.id, it.qty, keep, `Purchase order #${id} from ${po.supplier}`);
+  });
+  w('UPDATE purchase_orders SET status = ? WHERE id = ?', ['received', id]);
+  return po;
+}
+function pendingPOs() { return q("SELECT * FROM purchase_orders WHERE status = 'sent' ORDER BY id DESC"); }
+function sentToday(supplier) {
+  return q("SELECT COUNT(*) AS c FROM purchase_orders WHERE status = 'sent' AND supplier = ?", [supplier])[0].c > 0;
+}
+
+/* ---------------- cake orders ---------------- */
+function addCakeOrder(d) {
+  const id = nextId('cake_orders');
+  w('INSERT INTO cake_orders VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
+    [id, d.customer, d.phone, d.item, d.weight, d.text, d.due_day, d.due_time, d.amount, d.advance, 'pending', TODAY]);
+  return id;
+}
+function setCakeStatus(id, status) { w('UPDATE cake_orders SET status = ? WHERE id = ?', [status, id]); }
+function cakeOrders() { return q("SELECT * FROM cake_orders WHERE status <> 'delivered' ORDER BY due_day, due_time"); }
+function deliveredCakes() { return q("SELECT * FROM cake_orders WHERE status = 'delivered' ORDER BY due_day DESC"); }
+
+/* ---------------- reports ---------------- */
+function closing(day) {
+  const s = q('SELECT SUM(amount) AS amt, SUM(tax) AS tax, COUNT(*) AS bills FROM bills WHERE day = ?', [day])[0];
+  const items = q('SELECT SUM(qty) AS n FROM sales WHERE day = ?', [day])[0].n || 0;
+  const byPay = q('SELECT payment, COUNT(*) AS bills, SUM(amount) AS amt FROM bills WHERE day = ? GROUP BY payment ORDER BY amt DESC', [day]);
+  const top = q(`SELECT p.name, p.name_ta, SUM(s.qty) AS sold, SUM(s.amount) AS revenue FROM sales s JOIN products p ON s.product_id = p.id
+                 WHERE s.day = ? GROUP BY p.name, p.name_ta ORDER BY revenue DESC`, [day]);
+  const waste = q(`SELECT m.item, -SUM(m.delta) AS pcs, -SUM(m.delta * p.price) AS loss FROM movements m JOIN products p ON m.item = p.name
+                   WHERE m.kind = 'waste' AND m.day = ? GROUP BY m.item`, [day]);
+  const advance = q("SELECT SUM(advance) AS a FROM cake_orders WHERE created_day = ?", [day])[0].a || 0;
+  return { amount: s.amt || 0, tax: s.tax || 0, bills: s.bills || 0, items, byPay, top, waste,
+           wasteValue: waste.reduce((a, b) => a + b.loss, 0), advance };
+}
+function weekly() {
+  const from = dayOffset(-6);
+  const rows = q('SELECT day, SUM(amount) AS amt, COUNT(*) AS bills FROM bills WHERE day >= ? GROUP BY day', [from]);
+  const out = [];
+  for (let d = -6; d <= 0; d++) {
+    const day = dayOffset(d); const r = rows.find(x => x.day === day);
+    out.push({ day, amount: r ? r.amt : 0, bills: r ? r.bills : 0 });
+  }
+  return out;
+}
+function profit() {
+  return q(`SELECT p.id, p.name, p.name_ta, p.price, p.gst_rate, p.batch_yield, SUM(r.qty * i.cost) AS batch_cost
+            FROM recipes r JOIN ingredients i ON r.ingredient_id = i.id JOIN products p ON r.product_id = p.id
+            GROUP BY p.id, p.name, p.name_ta, p.price, p.gst_rate, p.batch_yield ORDER BY p.id`).map(r => {
+    const net = r.price * 100 / (100 + r.gst_rate);
+    const unit = r.batch_cost / r.batch_yield;
+    return { ...r, net, unit, margin: net - unit, pct: (net - unit) / net * 100 };
+  });
+}
+function wasteReport(days) {
+  const from = dayOffset(-days);
+  const waste = q(`SELECT m.item, -SUM(m.delta) AS pcs, -SUM(m.delta * p.price) AS loss FROM movements m JOIN products p ON m.item = p.name
+                   WHERE m.kind = 'waste' AND m.day >= ? GROUP BY m.item`, [from]);
+  const sold = q(`SELECT p.name, SUM(s.qty) AS sold FROM sales s JOIN products p ON s.product_id = p.id WHERE s.day >= ? GROUP BY p.name`, [from]);
+  return waste.map(w0 => {
+    const s = (sold.find(x => x.name === w0.item) || {}).sold || 0;
+    return { ...w0, sold: s, rate: w0.pcs / (s + w0.pcs) * 100 };
+  }).sort((a, b) => b.loss - a.loss);
+}
+function bakeTomorrow() {
+  const from = dayOffset(-7);
+  const prods = q('SELECT * FROM products ORDER BY id');
+  const sold = q('SELECT product_id, SUM(qty) AS n FROM sales WHERE day >= ? AND day < ? GROUP BY product_id', [from, TODAY]);
+  return prods.map(p => {
+    const avg = ((sold.find(s => s.product_id === p.id) || {}).n || 0) / 7;
+    const carry = q('SELECT SUM(qty) AS s FROM batches WHERE product_id = ? AND best_before > ?', [p.id, TODAY])[0].s || 0;
+    const need = Math.max(0, Math.ceil(avg) - carry);
+    return { id: p.id, name: p.name, name_ta: p.name_ta, avg, carry, need, batches: need ? Math.ceil(need / p.batch_yield) : 0, yield: p.batch_yield };
+  });
+}
+
+/* ---------------- save / load ---------------- */
+function dump() { const data = {}; TABLES.forEach(t => data[t] = db.exec(`SELECT * FROM ${t}`)); return data; }
+function restore(data) {
+  createSchema();
+  TABLES.forEach(t => { if (data[t] && data[t].length) db.exec(`INSERT INTO ${t} SELECT * FROM ?`, [data[t]]); });
+}
+
+root.Core = {
+  SCHEMA, TABLES, LOG, TODAY, dayOffset, nowTime, r2, r3,
+  get db() { return db; }, set onLog(f) { onLog = f; },
+  q, w, seed, dump, restore,
+  receive, addIngredient, recipeNeeds, bake, freshStock, writeOff,
+  checkout, productByBarcode,
+  reorderPlan, createPO, receivePO, pendingPOs, sentToday,
+  addCakeOrder, setCakeStatus, cakeOrders, deliveredCakes,
+  closing, weekly, profit, wasteReport, bakeTomorrow,
+};
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+(function(){
+const C = window.Core;
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const TODAY = C.TODAY, dayOffset = C.dayOffset;
+const IN_APP = !!window.NoorApp;
+const STORE_KEY = 'noor-bakery-db-v2';
+
+/* ---------- language ---------- */
+const TA = {
+ "Who is using the app?":"யார் பயன்படுத்துகிறார்கள்?","Owner":"உரிமையாளர்","Staff":"பணியாளர்","Enter 4-digit PIN":"4 இலக்க PIN உள்ளிடவும்","Unlock":"திற","Demo PINs":"டெமோ PIN",
+ "Inventory system":"இருப்பு மேலாண்மை","Billing, stock, baking, cake orders and reports, all on a SQL database.":"பில்லிங், இருப்பு, தயாரிப்பு, கேக் ஆர்டர்கள், அறிக்கைகள் — அனைத்தும் SQL தரவுத்தளத்தில்.",
+ "Lock":"பூட்டு","Reset demo data":"டெமோ தரவை மீட்டமை","Today's sales":"இன்றைய விற்பனை","Ingredient stock value":"மூலப்பொருள் இருப்பு மதிப்பு","at purchase cost":"வாங்கிய விலையில்",
+ "Need reordering":"ஆர்டர் செய்ய வேண்டியவை","ingredients at or below reorder level":"குறைந்த அளவில் உள்ள மூலப்பொருட்கள்","Cake orders open":"நிலுவையில் உள்ள கேக் ஆர்டர்கள்",
+ "Billing":"பில்லிங்","Bakery items":"பேக்கரி பொருட்கள்","Ingredients":"மூலப்பொருட்கள்","Bake":"தயாரி","Cake orders":"கேக் ஆர்டர்கள்","Reports":"அறிக்கைகள்","Stock history":"இருப்பு வரலாறு","SQL console":"SQL கன்சோல்",
+ "Scan barcode":"பார்கோடு ஸ்கேன்","or type barcode number":"அல்லது பார்கோடு எண்ணை உள்ளிடவும்","Add":"சேர்","Current bill":"தற்போதைய பில்","Customer name (optional)":"வாடிக்கையாளர் பெயர் (விருப்பம்)",
+ "WhatsApp number (optional)":"வாட்ஸ்அப் எண் (விருப்பம்)","Cash":"ரொக்கம்","Card":"கார்டு","Total":"மொத்தம்","GST included":"GST உட்பட","Complete bill":"பில் முடி","Clear bill":"பில்லை அழி",
+ "Tap an item to add it to the bill.":"பில்லில் சேர்க்க பொருளைத் தொடவும்.","left":"உள்ளது","Sold out":"தீர்ந்தது",
+ "Finished goods on the counter. Sales take from the oldest batch first (FIFO).":"கவுண்டரில் உள்ள பொருட்கள். பழைய தயாரிப்பு முதலில் விற்கப்படும் (FIFO).",
+ "Remove expired stock":"காலாவதியானவற்றை அகற்று","Item":"பொருள்","Price":"விலை","On counter":"கவுண்டரில்","Batches (best before)":"தயாரிப்புகள் (காலாவதி தேதி)","Status":"நிலை","Quick sell":"விரைவு விற்பனை","Sell":"விற்பனை",
+ "Raw materials in the store room. Red bars are at or below their reorder level.":"ஸ்டோர் அறையில் உள்ள மூலப்பொருட்கள். சிவப்பு = குறைந்த அளவு.",
+ "Ingredient":"மூலப்பொருள்","In stock":"இருப்பு","Level":"அளவு","Reorder at":"ஆர்டர் அளவு","Expiry":"காலாவதி","Receive stock from supplier":"சப்ளையரிடமிருந்து சரக்கு பெறு","Quantity":"அளவு","New expiry date":"புதிய காலாவதி தேதி","Add to stock":"இருப்பில் சேர்",
+ "Add a new ingredient":"புதிய மூலப்பொருள் சேர்","Name":"பெயர்","Unit":"அலகு","Opening stock":"தொடக்க இருப்பு","Cost per unit (₹)":"ஒரு அலகு விலை (₹)","Supplier":"சப்ளையர்","Add ingredient":"சேர்",
+ "Bake a batch":"தயாரிப்பு","Baking uses the recipe to take ingredients out of stock and adds the finished items to the counter.":"செய்முறைப்படி மூலப்பொருட்கள் இருப்பிலிருந்து குறைக்கப்பட்டு, தயாரான பொருட்கள் கவுண்டரில் சேர்க்கப்படும்.",
+ "What are you baking?":"என்ன தயாரிக்கிறீர்கள்?","Number of batches":"எத்தனை தொகுதி","Plan for tomorrow":"நாளைக்கான திட்டம்","Based on the average daily sales of the last 7 days, minus what is still fresh tomorrow.":"கடந்த 7 நாள் சராசரி விற்பனையிலிருந்து, நாளை வரை புதிதாக இருப்பதைக் கழித்து.",
+ "Sells per day":"நாள் விற்பனை","Fresh tomorrow":"நாளை புதியது","To bake":"தயாரிக்க","Enough":"போதுமானது","Short by":"குறைவு",
+ "Custom cakes with delivery date, advance and balance.":"டெலிவரி தேதி, முன்பணம், மீதியுடன் சிறப்பு கேக்குகள்.","New cake order":"புதிய கேக் ஆர்டர்","Customer name":"வாடிக்கையாளர் பெயர்","WhatsApp number":"வாட்ஸ்அப் எண்","Cake":"கேக்","Weight (kg)":"எடை (கி.கி)","Message on cake":"கேக்கில் எழுத்து","Delivery date":"டெலிவரி தேதி","Time":"நேரம்","Price (₹)":"விலை (₹)","Advance paid (₹)":"முன்பணம் (₹)","Save order":"ஆர்டர் சேமி","Delivered orders":"வழங்கப்பட்ட ஆர்டர்கள்",
+ "Advance":"முன்பணம்","Balance":"மீதி","Mark ready":"தயார் எனக் குறி","Delivered":"வழங்கப்பட்டது","Ready":"தயார்","Pending":"நிலுவை","Today":"இன்று","Tomorrow":"நாளை","Overdue":"தாமதம்","Tell customer":"வாடிக்கையாளருக்குச் சொல்",
+ "Daily closing report":"தினசரி கணக்கு முடிவு","Send on WhatsApp":"வாட்ஸ்அப்பில் அனுப்பு","Share":"பகிர்","Sales, last 7 days":"கடந்த 7 நாள் விற்பனை","Profit per item":"பொருள் வாரியான லாபம்",
+ "Ingredient cost from the recipe, compared with the price after GST. Labour, gas and fillings are not included.":"செய்முறை மூலப்பொருள் செலவு, GST நீக்கிய விலையுடன் ஒப்பீடு. கூலி, எரிவாயு சேர்க்கப்படவில்லை.",
+ "After GST":"GST நீக்கி","Ingredient cost":"மூலப்பொருள் செலவு","Profit / pc":"லாபம் / ஒன்று","Margin":"லாப விகிதம்","Waste, last 7 days":"கடந்த 7 நாள் வீணானவை","Items thrown away after their best-before date, valued at selling price.":"காலாவதியானதால் அகற்றப்பட்டவை, விற்பனை விலையில்.",
+ "Wasted":"வீணானது","Sold":"விற்றது","Waste rate":"வீண் விகிதம்","Loss":"இழப்பு","GST rates in this demo are examples. Confirm the rates for each item with your accountant.":"இந்த டெமோவில் உள்ள GST விகிதங்கள் உதாரணம் மட்டுமே. உங்கள் கணக்காளரிடம் உறுதி செய்யவும்.",
+ "Every change to stock is written to a movements table, so nothing goes missing without a record.":"இருப்பில் ஒவ்வொரு மாற்றமும் பதிவு செய்யப்படுகிறது.","When":"எப்போது","Type":"வகை","Change":"மாற்றம்","Note":"குறிப்பு",
+ "Ask the database anything. Pick an example or write your own query.":"தரவுத்தளத்திடம் எதையும் கேளுங்கள்.","Run query":"இயக்கு","Database tables (schema)":"தரவுத்தள அட்டவணைகள்",
+ "SQL that just ran":"இப்போது இயங்கிய SQL","Clear":"அழி","Make a bill, bake or receive stock. The real SQL statements the app sends to the database show up here.":"பில் போடுங்கள், தயாரியுங்கள் அல்லது சரக்கு பெறுங்கள். இயங்கும் SQL இங்கே தெரியும்.",
+ "Reorder":"ஆர்டர் செய்","Use soon":"விரைவில் பயன்படுத்து","Expired":"காலாவதி","OK":"சரி","Sell today":"இன்றே விற்கவும்","Bake soon":"விரைவில் தயாரிக்கவும்","expired":"காலாவதி",
+ "Received":"பெறப்பட்டது","Baked":"தயாரிக்கப்பட்டது","Wasted ":"வீணானது",
+ "Order from suppliers":"சப்ளையர்களிடம் ஆர்டர்","Send order on WhatsApp":"வாட்ஸ்அப்பில் ஆர்டர் அனுப்பு","Order sent":"ஆர்டர் அனுப்பப்பட்டது","Mark received":"பெறப்பட்டது எனக் குறி","Waiting for delivery":"டெலிவரிக்காக காத்திருக்கிறது","All ingredients are above their reorder level.":"எல்லா மூலப்பொருட்களும் போதுமான அளவில் உள்ளன.","est.":"சுமார்",
+ "Bills":"பில்கள்","Items sold":"விற்ற பொருட்கள்","GST collected":"வசூலித்த GST","Cake advances":"கேக் முன்பணம்","Waste today":"இன்று வீணானது","By payment":"கட்டண முறைப்படி","Top sellers":"அதிகம் விற்றவை",
+ "Bill saved":"பில் சேமிக்கப்பட்டது","New bill":"புதிய பில்","Copy text":"நகலெடு","Barcode":"பார்கோடு","Close":"மூடு","Point the camera at the barcode.":"கேமராவை பார்கோடு நோக்கிக் காட்டவும்.",
+ "Wrong PIN. Try again.":"தவறான PIN. மீண்டும் முயற்சிக்கவும்.","Bake now":"இப்போது தயாரி","No sales yet today.":"இன்று இன்னும் விற்பனை இல்லை.","Nothing to bake":"தேவையில்லை",
+};
+let LANG = 'en';
+try { LANG = localStorage.getItem('noor-lang') || 'en'; } catch(e){}
+const t = s => (LANG === 'ta' && TA[s]) ? TA[s] : s;
+const nm = o => (LANG === 'ta' && o.name_ta) ? o.name_ta : o.name;
+function applyLang(){
+  document.documentElement.lang = LANG === 'ta' ? 'ta' : 'en';
+  $$('[data-t]').forEach(el => el.textContent = t(el.dataset.t));
+  $$('[data-tp]').forEach(el => el.placeholder = t(el.dataset.tp));
+  $$('[data-lang-toggle]').forEach(b => b.textContent = LANG === 'ta' ? 'English' : 'தமிழ்');
+}
+
+/* ---------- helpers ---------- */
+const rupee = v => '₹' + Math.round(v).toLocaleString('en-IN');
+const rupee2 = v => '₹' + (Math.round(v*100)/100).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const qtyFmt = (v, unit) => { const n = Math.round(v*1000)/1000; return (unit==='pcs' ? Math.round(n) : n.toLocaleString('en-IN',{maximumFractionDigits:2})) + ' ' + unit; };
+const daysUntil = iso => Math.round((new Date(iso+'T00:00:00') - new Date(TODAY+'T00:00:00'))/86400000);
+const niceDate = iso => new Date(iso+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+const time12 = hm => { const [h,m] = hm.split(':').map(Number); return `${((h+11)%12)+1}:${String(m).padStart(2,'0')} ${h<12?'AM':'PM'}`; };
+const digits = s => String(s||'').replace(/\D/g,'');
+const waLink = (phone, text) => { let d = digits(phone); if (d.length === 10) d = '91' + d; return `https://wa.me/${d}?text=${encodeURIComponent(text)}`; };
+const pill = (cls, text) => `<span class="pill ${cls}">${esc(text)}</span>`;
 function expiryInfo(iso){
   const d = daysUntil(iso);
-  if (d < 0) return {cls:'bad', text:`Expired ${-d}d ago`};
-  if (d === 0) return {cls:'bad', text:'Expires today'};
-  if (d <= 3) return {cls:'warn', text:`${d} day${d>1?'s':''} left`};
+  if (d < 0) return {cls:'bad', text:`${t('Expired')} (${-d}d)`};
+  if (d === 0) return {cls:'bad', text:t('Today')};
+  if (d <= 3) return {cls:'warn', text:`${d}d`};
   return null;
 }
-
-function renderFigures(){
-  const s = q('SELECT SUM(amount) AS a, SUM(qty) AS n, COUNT(*) AS c FROM sales WHERE day = ?',[TODAY])[0];
-  $('#fSales').textContent = rupee(s.a || 0);
-  $('#fSalesSub').textContent = `${s.n || 0} items in ${s.c || 0} bills`;
-  $('#fValue').textContent = rupee(q('SELECT SUM(qty * cost) AS v FROM ingredients')[0].v || 0);
-  const low = q('SELECT COUNT(*) AS c FROM ingredients WHERE qty <= reorder_level')[0].c;
-  $('#fLow').textContent = low;
-  const lim = dayOffset(3);
-  const e1 = q('SELECT COUNT(*) AS c FROM ingredients WHERE expiry <= ?',[lim])[0].c;
-  const e2 = q('SELECT COUNT(*) AS c FROM batches WHERE best_before <= ?',[TODAY])[0].c;
-  $('#fExp').textContent = e1 + e2;
-  $('#fExp').nextElementSibling.textContent = `${e1} ingredients within 3 days, ${e2} counter batches due today or past`;
+let toastTimer;
+function toast(msg){ const el = $('#toast'); el.textContent = msg; el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(()=>el.hidden=true, 2800); }
+function shareText(text){
+  if (IN_APP) { try { window.NoorApp.share(text); return; } catch(e){} }
+  const done = () => toast('Copied. Paste it anywhere.');
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text));
+  else fallbackCopy(text);
+}
+function fallbackCopy(text){
+  const ta = document.createElement('textarea'); ta.value = text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); toast('Copied. Paste it anywhere.'); } catch(e){ toast('Select the text and copy it.'); }
+  ta.remove();
 }
 
+/* ---------- state ---------- */
+let ROLE = 'Owner';
+let PAY = 'UPI';
+const cart = new Map(); // pid -> qty
+let freshCount = 0;
+C.onLog = () => freshCount++;
+
+function saveDb(){ if (!IN_APP) return; try { localStorage.setItem(STORE_KEY, JSON.stringify(C.dump())); } catch(e){} }
+function loadDb(){ if (!IN_APP) return false; try { const raw = localStorage.getItem(STORE_KEY); if (!raw) return false; C.restore(JSON.parse(raw)); return true; } catch(e){ return false; } }
+
+/* ---------- modal ---------- */
+let onModalClose = null;
+function openModal(title, html, onClose){ $('#modalTitle').textContent = title; $('#modalBody').innerHTML = html; $('#modalBack').hidden = false; onModalClose = onClose || null; }
+function closeModal(){ $('#modalBack').hidden = true; $('#modalBody').innerHTML = ''; if (onModalClose){ const f = onModalClose; onModalClose = null; f(); } }
+$('#modalClose').addEventListener('click', closeModal);
+$('#modalBack').addEventListener('click', e => { if (e.target.id === 'modalBack') closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modalBack').hidden) closeModal(); });
+
+/* ---------- figures & alerts ---------- */
+function renderFigures(){
+  const s = C.closing(TODAY);
+  $('#fSales').textContent = rupee(s.amount);
+  $('#fSalesSub').textContent = `${s.items} ${LANG==='ta'?'பொருட்கள்':'items'} · ${s.bills} ${LANG==='ta'?'பில்கள்':'bills'}`;
+  $('#fValue').textContent = rupee(C.q('SELECT SUM(qty * cost) AS v FROM ingredients')[0].v || 0);
+  $('#fLow').textContent = C.q('SELECT COUNT(*) AS c FROM ingredients WHERE qty <= reorder_level')[0].c;
+  const open = C.cakeOrders();
+  $('#fCakes').textContent = open.length;
+  const dueSoon = open.filter(o => o.due_day <= dayOffset(1)).length;
+  $('#fCakesSub').textContent = `${dueSoon} ${LANG==='ta'?'இன்று/நாளை டெலிவரி':'due today or tomorrow'}`;
+}
 function renderAlerts(){
   const out = [];
-  q('SELECT name, qty, unit, reorder_level, supplier FROM ingredients WHERE qty <= reorder_level ORDER BY name').forEach(r => {
-    out.push(`<div class="alert-row bad"><span class="what"><strong>Reorder ${esc(r.name)}</strong>: ${qtyFmt(r.qty,r.unit)} left, reorder level is ${qtyFmt(r.reorder_level,r.unit)}. Supplier: ${esc(r.supplier)}</span><button class="btn small" data-receive="${esc(r.name)}">Receive stock</button></div>`);
+  C.cakeOrders().forEach(o => {
+    const d = daysUntil(o.due_day);
+    if (d <= 0 && o.status !== 'ready') out.push(`<div class="alert-row ${d<0?'bad':'info'}"><span class="what"><strong>${d<0?t('Overdue'):t('Today')} ${time12(o.due_time)}:</strong> ${esc(o.item)} ${o.weight_kg} kg · ${esc(o.customer)}</span><button class="btn small" data-goto="cakes">${esc(t('Cake orders'))}</button></div>`);
   });
-  const exp = q(`SELECT p.name, SUM(b.qty) AS n FROM batches b JOIN products p ON b.product_id = p.id WHERE b.best_before < ? GROUP BY p.name`,[TODAY]);
-  exp.forEach(r => out.push(`<div class="alert-row bad"><span class="what"><strong>${r.n} × ${esc(r.name)}</strong> are past best-before and should come off the counter.</span><button class="btn small" data-goto="products">Review</button></div>`));
-  q(`SELECT p.name, SUM(b.qty) AS n FROM batches b JOIN products p ON b.product_id = p.id WHERE b.best_before = ? GROUP BY p.name`,[TODAY]).forEach(r =>
-    out.push(`<div class="alert-row"><span class="what"><strong>Sell today:</strong> ${r.n} × ${esc(r.name)} reach best-before tonight.</span></div>`));
+  if (ROLE === 'Owner') C.q('SELECT name, name_ta, qty, unit, reorder_level FROM ingredients WHERE qty <= reorder_level ORDER BY name').forEach(r => {
+    out.push(`<div class="alert-row bad"><span class="what"><strong>${esc(t('Reorder'))}: ${esc(nm(r))}</strong> · ${qtyFmt(r.qty,r.unit)} / ${qtyFmt(r.reorder_level,r.unit)}</span><button class="btn small" data-goto="ingredients">${esc(t('Order from suppliers'))}</button></div>`);
+  });
+  C.q(`SELECT p.name, p.name_ta, SUM(b.qty) AS n FROM batches b JOIN products p ON b.product_id = p.id WHERE b.best_before < ? GROUP BY p.name, p.name_ta`,[TODAY]).forEach(r =>
+    out.push(`<div class="alert-row bad"><span class="what"><strong>${r.n} × ${esc(nm(r))}</strong> ${LANG==='ta'?'காலாவதியானது, கவுண்டரிலிருந்து அகற்றவும்.':'are past best-before. Remove them from the counter.'}</span><button class="btn small" data-goto="products">${esc(t('Bakery items'))}</button></div>`));
+  C.q(`SELECT p.name, p.name_ta, SUM(b.qty) AS n FROM batches b JOIN products p ON b.product_id = p.id WHERE b.best_before = ? GROUP BY p.name, p.name_ta`,[TODAY]).forEach(r =>
+    out.push(`<div class="alert-row"><span class="what"><strong>${esc(t('Sell today'))}:</strong> ${r.n} × ${esc(nm(r))}</span></div>`));
   $('#alerts').innerHTML = out.join('');
 }
 
-function renderIngredients(){
-  const rows = q('SELECT * FROM ingredients ORDER BY name');
-  $('#ingBody').innerHTML = rows.map(r => {
-    const low = r.qty <= r.reorder_level;
-    const pct = Math.max(4, Math.min(100, r.qty / (r.reorder_level*2.5) * 100));
-    const ex = expiryInfo(r.expiry);
-    const status = [low ? pill('bad','Reorder') : '', ex ? pill(ex.cls, ex.cls==='bad' && daysUntil(r.expiry)<0 ? 'Expired' : 'Use soon') : '', (!low && !ex) ? pill('ok','OK') : ''].join('');
-    return `<tr><td><div class="item-name">${esc(r.name)}</div><div class="muted">${esc(r.supplier)} · ${rupee(r.cost)}/${esc(r.unit)}</div></td>
-      <td class="r num" data-label="In stock">${qtyFmt(r.qty,r.unit)}</td>
-      <td data-label="Level"><div class="bar ${low?'low':''}"><span style="width:${pct}%"></span></div></td>
-      <td class="r num muted" data-label="Reorder at">${qtyFmt(r.reorder_level,r.unit)}</td>
-      <td class="num" data-label="Expiry"><div>${niceDate(r.expiry)}${ex?`<div class="muted">${ex.text}</div>`:''}</div></td>
-      <td data-label="Status"><div>${status}</div></td></tr>`;
+/* ---------- billing ---------- */
+function renderTiles(){
+  const prods = C.q('SELECT * FROM products ORDER BY id');
+  $('#tiles').innerHTML = prods.map(p => {
+    const have = C.freshStock(p.id); const inCart = cart.get(p.id) || 0;
+    return `<button class="tile" type="button" data-add="${p.id}" ${have - inCart > 0 ? '' : 'disabled'}>
+      ${inCart ? `<span class="t-in">${inCart}</span>` : ''}
+      <span class="t-name">${esc(nm(p))}</span>
+      <span class="t-price num">${rupee(p.price)}</span>
+      <span class="t-left">${have ? `${have - inCart} ${t('left')}` : t('Sold out')}</span>
+    </button>`;
   }).join('');
-  const sel = $('#rcvItem'); const keep = sel.value;
-  sel.innerHTML = rows.map(r => `<option value="${r.id}">${esc(r.name)} (${esc(r.unit)})</option>`).join('');
-  if (keep) sel.value = keep;
+}
+function cartLines(){
+  return [...cart.entries()].map(([pid, qty]) => ({ p: C.q('SELECT * FROM products WHERE id = ?',[pid])[0], qty }));
+}
+function renderCart(){
+  const lines = cartLines();
+  let total = 0, tax = 0;
+  $('#cartLines').innerHTML = lines.length ? lines.map(({p, qty}) => {
+    const a = qty * p.price; total += a; tax += a * p.gst_rate / (100 + p.gst_rate);
+    return `<div class="cline"><span class="nm">${esc(nm(p))}<br><span class="muted" style="font-size:.78rem">${rupee(p.price)} · GST ${p.gst_rate}%</span></span><span class="amt">${rupee(a)}</span>
+      <div class="qtyctl"><button type="button" data-dec="${p.id}" aria-label="One less">−</button><span>${qty}</span><button type="button" data-inc="${p.id}" aria-label="One more">+</button></div></div>`;
+  }).join('') : `<p class="empty">${esc(t('Tap an item to add it to the bill.'))}</p>`;
+  $('#cartTotal').textContent = rupee(total);
+  $('#cartTax').textContent = rupee2(tax);
+  $('#checkoutBtn').disabled = !lines.length;
+  $$('#paySeg button').forEach(b => b.setAttribute('aria-pressed', b.dataset.pay === PAY ? 'true' : 'false'));
+}
+function addToCart(pid, n = 1){
+  const have = C.freshStock(pid); const cur = cart.get(pid) || 0;
+  const p = C.q('SELECT * FROM products WHERE id = ?',[pid])[0];
+  if (cur + n > have){ toast(have ? `${LANG==='ta'?'மீதம்':'Only'} ${have} ${nm(p)} ${LANG==='ta'?'உள்ளது':'left'}` : `${nm(p)}: ${t('Sold out')}`); return false; }
+  cart.set(pid, cur + n); renderTiles(); renderCart(); return true;
+}
+function receiptText(b){
+  const L = [];
+  L.push('NOOR BAKERY'); L.push('GSTIN 33ABCDE1234F1Z5 (demo)');
+  L.push(`Bill ${b.bill_no}  ${niceDate(b.day)} ${time12(b.time)}`);
+  if (b.customer) L.push('Customer: ' + b.customer);
+  L.push('------------------------------');
+  b.items.forEach(i => L.push(`${i.name} x${i.qty}  ${rupee(i.amount)}`));
+  L.push('------------------------------');
+  L.push(`TOTAL ${rupee(b.amount)}`);
+  L.push(`(incl. GST ${rupee2(b.tax)})`);
+  L.push(`Paid by ${b.payment}`);
+  L.push('Thank you! Visit again.');
+  return L.join('\n');
+}
+function showReceipt(b){
+  const rows = b.items.map(i => `<div class="row"><span>${esc(nm(i))} ×${i.qty}</span><span>${rupee(i.amount)}</span></div>`).join('');
+  const gstRows = [...new Set(b.items.map(i => i.gst_rate))].filter(r => r > 0).map(r => {
+    const tx = b.items.filter(i => i.gst_rate === r).reduce((a,i)=>a+i.tax,0);
+    return `<div class="row muted"><span>CGST ${r/2}% + SGST ${r/2}%</span><span>${rupee2(tx)}</span></div>`;
+  }).join('');
+  const text = receiptText(b);
+  openModal(t('Bill saved'), `
+    <div class="receipt">
+      <div class="c big">NOOR BAKERY</div>
+      <div class="c muted">GSTIN 33ABCDE1234F1Z5 (demo)</div>
+      <hr><div class="row"><span>${esc(b.bill_no)}</span><span>${niceDate(b.day)} ${time12(b.time)}</span></div>
+      ${b.customer ? `<div class="row"><span>${esc(b.customer)}</span><span>${esc(b.phone)}</span></div>` : ''}
+      <hr>${rows}<hr>
+      <div class="row big"><span>TOTAL</span><span>${rupee(b.amount)}</span></div>
+      ${gstRows}
+      <div class="row muted"><span>Paid by</span><span>${esc(b.payment)}</span></div>
+    </div>
+    <div class="acts">
+      <a class="btn wa" target="_blank" rel="noopener" href="${esc(waLink(b.phone, text))}">${esc(t('Send on WhatsApp'))}</a>
+      <button class="btn" type="button" id="rcShare">${esc(IN_APP ? t('Share') : t('Copy text'))}</button>
+    </div>
+    <button class="btn primary big" type="button" id="rcNew">${esc(t('New bill'))}</button>`);
+  $('#rcShare').addEventListener('click', () => shareText(text));
+  $('#rcNew').addEventListener('click', closeModal);
+}
+function doCheckout(lines, info){
+  const r = C.checkout(lines, { ...info, staff: ROLE });
+  if (!r.ok){ toast(r.error === 'stock' ? `${r.name}: ${r.have} ${t('left')}` : t('Tap an item to add it to the bill.')); return null; }
+  return r.bill;
 }
 
+/* ---------- products ---------- */
 function renderProducts(){
-  const prods = q('SELECT * FROM products ORDER BY id');
+  const prods = C.q('SELECT * FROM products ORDER BY id');
   $('#prodBody').innerHTML = prods.map(p => {
-    const bs = q('SELECT * FROM batches WHERE product_id = ? AND qty > 0 ORDER BY best_before',[p.id]);
+    const bs = C.q('SELECT * FROM batches WHERE product_id = ? AND qty > 0 ORDER BY best_before',[p.id]);
     const fresh = bs.filter(b => b.best_before >= TODAY).reduce((a,b)=>a+b.qty,0);
     const expired = bs.filter(b => b.best_before < TODAY).reduce((a,b)=>a+b.qty,0);
     const today = bs.filter(b => b.best_before === TODAY).reduce((a,b)=>a+b.qty,0);
     const st = [];
-    if (expired) st.push(pill('bad', `${expired} expired`));
-    if (today) st.push(pill('warn','Sell today'));
-    if (fresh < p.reorder_level) st.push(pill('warn','Bake soon'));
-    if (!st.length) st.push(pill('ok','OK'));
-    const bl = bs.map(b => { const ex = expiryInfo(b.best_before); return `<div class="num ${ex?'':'muted'}" style="font-size:.82rem">${b.qty} pcs · ${niceDate(b.best_before)}${ex?` <span style="color:var(--${ex.cls})">(${ex.text})</span>`:''}</div>`; }).join('') || '<span class="muted">None</span>';
-    return `<tr><td><div class="item-name">${esc(p.name)}</div><div class="muted">${esc(p.category)} · keeps ${p.shelf_days} day${p.shelf_days>1?'s':''}</div></td>
-      <td class="r num" data-label="Price">${rupee(p.price)}</td>
-      <td class="r num" data-label="On counter"><strong>${fresh}</strong> pcs</td>
-      <td data-label="Batches"><div>${bl}</div></td>
-      <td data-label="Status"><div>${st.join('')}</div></td>
-      <td class="r sell-cell"><div class="sell"><input type="number" id="sellQty${p.id}" min="1" value="1" aria-label="Quantity of ${esc(p.name)}"><button class="btn small primary" data-sell="${p.id}" ${fresh?'':'disabled'}>Sell</button></div></td></tr>`;
+    if (expired) st.push(pill('bad', `${expired} ${t('expired')}`));
+    if (today) st.push(pill('warn', t('Sell today')));
+    if (fresh < p.reorder_level) st.push(pill('warn', t('Bake soon')));
+    if (!st.length) st.push(pill('ok', t('OK')));
+    const bl = bs.map(b => { const ex = expiryInfo(b.best_before); return `<div class="num ${ex?'':'muted'}" style="font-size:.82rem">${b.qty} pcs · ${niceDate(b.best_before)}${ex?` <span style="color:var(--${ex.cls})">(${ex.text})</span>`:''}</div>`; }).join('') || '<span class="muted">—</span>';
+    return `<tr><td><div class="item-name">${esc(nm(p))}</div><div class="muted">${esc(p.category)} · GST ${p.gst_rate}% · <button class="linkbtn" type="button" data-barcode="${p.id}">${esc(t('Barcode'))} ${esc(p.barcode)}</button></div></td>
+      <td class="r num" data-label="${esc(t('Price'))}">${rupee(p.price)}</td>
+      <td class="r num" data-label="${esc(t('On counter'))}"><strong>${fresh}</strong> pcs</td>
+      <td data-label="${esc(t('Batches (best before)'))}"><div>${bl}</div></td>
+      <td data-label="${esc(t('Status'))}"><div>${st.join('')}</div></td>
+      <td class="r sell-cell"><div class="sell"><input type="number" id="sellQty${p.id}" min="1" value="1" aria-label="Quantity"><button class="btn small primary" type="button" data-sell="${p.id}" ${fresh?'':'disabled'}>${esc(t('Sell'))}</button></div></td></tr>`;
   }).join('');
   const sel = $('#bakeItem'); const keep = sel.value;
-  sel.innerHTML = prods.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  sel.innerHTML = prods.map(p => `<option value="${p.id}">${esc(nm(p))}</option>`).join('');
   if (keep) sel.value = keep;
 }
+function showBarcode(pid){
+  const p = C.q('SELECT * FROM products WHERE id = ?',[pid])[0];
+  openModal(`${t('Barcode')}: ${nm(p)}`, `<div class="barcode-box"><svg id="bcSvg"></svg></div><p class="muted" style="margin:0;font-size:.85rem">${LANG==='ta'?'இதை வேறு ஒரு கைபேசியில் திறந்து, பில்லிங்கில் "பார்கோடு ஸ்கேன்" மூலம் சோதிக்கவும்.':'Open this on another screen and scan it from Billing to test the scanner. In the real shop, this is the label printed on packed items.'}</p>`);
+  try { window.JsBarcode('#bcSvg', p.barcode, { format:'EAN13', background:'#ffffff', lineColor:'#000000', width:2.4, height:90, fontSize:18, margin:10 }); }
+  catch(e){ $('#bcSvg').outerHTML = `<p class="num" style="color:#000;font-size:1.4rem;margin:0">${esc(p.barcode)}</p>`; }
+}
 
+/* ---------- scanner ---------- */
+let reader = null;
+function stopScan(){ try { reader && reader.reset(); } catch(e){} reader = null; }
+function startScan(){
+  openModal(t('Scan barcode'), `<video class="scan-video" id="scanVideo" playsinline muted></video><p class="muted" id="scanMsg" style="margin:0">${esc(t('Point the camera at the barcode.'))}</p>`, stopScan);
+  if (!window.ZXing){ $('#scanMsg').textContent = 'Scanner did not load. Type the barcode number instead.'; return; }
+  try {
+    reader = new window.ZXing.BrowserMultiFormatReader();
+    reader.decodeFromConstraints({ video: { facingMode: 'environment' } }, 'scanVideo', (res) => {
+      if (res){ const code = res.getText(); stopScan(); closeModal(); handleCode(code); }
+    }).catch(() => { $('#scanMsg').textContent = LANG==='ta' ? 'கேமரா கிடைக்கவில்லை. பார்கோடு எண்ணை உள்ளிடவும்.' : 'Camera is not available here. Type the barcode number instead.'; });
+  } catch(e){ $('#scanMsg').textContent = 'Camera is not available here. Type the barcode number instead.'; }
+}
+function handleCode(code){
+  const p = C.productByBarcode(code);
+  if (!p){ toast(`${LANG==='ta'?'இந்த பார்கோடு இல்லை':'No item with barcode'} ${code}`); return; }
+  showTab('billing');
+  if (addToCart(p.id, 1)) toast(`+1 ${nm(p)}`);
+}
+
+/* ---------- ingredients & purchase orders ---------- */
+function poMessage(plan){
+  const lines = plan.items.map(i => `• ${i.name} – ${qtyFmt(i.qty, i.unit)}`).join('\n');
+  return `Hello ${plan.supplier}, this is Noor Bakery.\nPlease send:\n${lines}\nThank you.`;
+}
+let PLANS = [];
+function renderPO(){
+  PLANS = C.reorderPlan();
+  const pend = C.pendingPOs();
+  const planHtml = PLANS.length ? PLANS.map((p, i) => {
+    const sent = C.sentToday(p.supplier);
+    const est = p.items.reduce((a, x) => a + x.qty * x.cost, 0);
+    return `<div class="card" style="background:var(--bg)">
+      <div class="panel-head"><div><strong>${esc(p.supplier)}</strong><div class="muted" style="font-size:.82rem">${esc(p.phone)} · ${t('est.')} ${rupee(est)}</div></div>${sent ? pill('ok', t('Order sent')) : ''}</div>
+      <div class="mini">${p.items.map(x => `<div><span>${esc(x.name)}</span><span class="num">${qtyFmt(x.qty, x.unit)}</span></div>`).join('')}</div>
+      ${sent ? '' : `<a class="btn wa" target="_blank" rel="noopener" data-po="${i}" href="${esc(waLink(p.phone, poMessage(p)))}">${esc(t('Send order on WhatsApp'))}</a>`}
+    </div>`;
+  }).join('') : `<p class="empty">${esc(t('All ingredients are above their reorder level.'))}</p>`;
+  const pendHtml = pend.map(po => `<div class="alert-row info"><span class="what"><strong>#${po.id} ${esc(po.supplier)}</strong> · ${JSON.parse(po.items).map(x => `${esc(x.name)} ${qtyFmt(x.qty,x.unit)}`).join(', ')}<br><span class="muted" style="font-size:.8rem">${esc(t('Waiting for delivery'))} · ${niceDate(po.day)}</span></span><button class="btn small primary" type="button" data-porecv="${po.id}">${esc(t('Mark received'))}</button></div>`).join('');
+  $('#poCard').innerHTML = `<h3>${esc(t('Order from suppliers'))}</h3><p class="muted" style="font-size:.85rem">${LANG==='ta'?'குறைந்த மூலப்பொருட்கள் சப்ளையர் வாரியாகப் பிரிக்கப்பட்டுள்ளன. ஒரே தொடுதலில் ஆர்டர் அனுப்பலாம்.':'Low ingredients grouped by supplier, with suggested quantities. One tap sends the order.'}</p>${planHtml}${pendHtml}`;
+}
+function renderIngredients(){
+  const rows = C.q('SELECT * FROM ingredients ORDER BY name');
+  $('#ingBody').innerHTML = rows.map(r => {
+    const low = r.qty <= r.reorder_level;
+    const pct = Math.max(4, Math.min(100, r.qty / (r.reorder_level*2.5) * 100));
+    const ex = expiryInfo(r.expiry);
+    const status = [low ? pill('bad', t('Reorder')) : '', ex ? pill(ex.cls, daysUntil(r.expiry) < 0 ? t('Expired') : t('Use soon')) : '', (!low && !ex) ? pill('ok', t('OK')) : ''].join('');
+    return `<tr><td><div class="item-name">${esc(nm(r))}</div><div class="muted">${esc(r.supplier)} · ${rupee(r.cost)}/${esc(r.unit)}</div></td>
+      <td class="r num" data-label="${esc(t('In stock'))}">${qtyFmt(r.qty,r.unit)}</td>
+      <td data-label="${esc(t('Level'))}"><div class="bar ${low?'low':''}"><span style="width:${pct}%"></span></div></td>
+      <td class="r num muted" data-label="${esc(t('Reorder at'))}">${qtyFmt(r.reorder_level,r.unit)}</td>
+      <td class="num" data-label="${esc(t('Expiry'))}"><div>${niceDate(r.expiry)}${ex?`<div class="muted">${esc(ex.text)}</div>`:''}</div></td>
+      <td data-label="${esc(t('Status'))}"><div>${status}</div></td></tr>`;
+  }).join('');
+  const sel = $('#rcvItem'); const keep = sel.value;
+  sel.innerHTML = rows.map(r => `<option value="${r.id}">${esc(nm(r))} (${esc(r.unit)})</option>`).join('');
+  if (keep) sel.value = keep;
+  const sup = $('#niSupplier'); const ks = sup.value;
+  sup.innerHTML = C.q('SELECT name FROM suppliers ORDER BY name').map(s => `<option>${esc(s.name)}</option>`).join('');
+  if (ks) sup.value = ks;
+  renderPO();
+}
+
+/* ---------- bake ---------- */
 function renderBake(){
   const pid = +$('#bakeItem').value || 1; const n = Math.max(1, +$('#bakeN').value || 1);
-  const p = q('SELECT * FROM products WHERE id = ?',[pid])[0];
-  const needs = recipeNeeds(pid, n);
+  const p = C.q('SELECT * FROM products WHERE id = ?',[pid])[0];
+  const needs = C.recipeNeeds(pid, n);
   const ok = needs.every(x => x.need <= x.have + 1e-9);
-  $('#bakeYield').innerHTML = `${n} batch${n>1?'es':''} makes <strong>${p.batch_yield*n} × ${esc(p.name)}</strong>, best before ${niceDate(dayOffset(p.shelf_days))}. Ingredients needed:`;
+  $('#bakeYield').innerHTML = LANG==='ta'
+    ? `${n} தொகுதி = <strong>${p.batch_yield*n} × ${esc(nm(p))}</strong>, காலாவதி ${niceDate(dayOffset(p.shelf_days))}. தேவையான மூலப்பொருட்கள்:`
+    : `${n} batch${n>1?'es':''} makes <strong>${p.batch_yield*n} × ${esc(nm(p))}</strong>, best before ${niceDate(dayOffset(p.shelf_days))}. Ingredients needed:`;
   $('#needList').innerHTML = needs.map(x => {
     const enough = x.need <= x.have + 1e-9;
-    return `<div class="need"><span>${esc(x.name)} <span class="have">· have ${qtyFmt(x.have,x.unit)}</span></span><span class="num">${qtyFmt(x.need,x.unit)}</span>${enough?pill('ok','Enough'):pill('bad','Short by '+qtyFmt(x.need-x.have,x.unit))}</div>`;
+    return `<div class="need"><span>${esc(nm(x))} <span class="have">· ${qtyFmt(x.have,x.unit)}</span></span><span class="num">${qtyFmt(x.need,x.unit)}</span>${enough?pill('ok',t('Enough')):pill('bad',t('Short by')+' '+qtyFmt(x.need-x.have,x.unit))}</div>`;
   }).join('');
   $('#bakeBtn').disabled = !ok;
+  $('#planBody').innerHTML = C.bakeTomorrow().map(b => `<tr><td><div class="item-name">${esc(nm(b))}</div></td>
+    <td class="r num" data-label="${esc(t('Sells per day'))}">${b.avg.toFixed(1)}</td>
+    <td class="r num" data-label="${esc(t('Fresh tomorrow'))}">${b.carry}</td>
+    <td class="r num" data-label="${esc(t('To bake'))}">${b.need ? `<strong>${b.need}</strong> pcs <span class="muted">(${b.batches} × ${b.yield})</span>` : `<span class="muted">${esc(t('Nothing to bake'))}</span>`}</td>
+    <td class="r">${b.need ? `<button class="btn small" type="button" data-plan="${b.id}" data-batches="${b.batches}">${esc(t('Bake now'))}</button>` : ''}</td></tr>`).join('');
 }
 
-function renderSales(){
-  const s = q('SELECT SUM(amount) AS a, SUM(qty) AS n, COUNT(*) AS c FROM sales WHERE day = ?',[TODAY])[0];
-  $('#salesSummary').textContent = `${rupee(s.a||0)} from ${s.n||0} items across ${s.c||0} bills`;
-  const by = q(`SELECT p.name, SUM(s.qty) AS sold, SUM(s.amount) AS revenue FROM sales s JOIN products p ON s.product_id = p.id WHERE s.day = ? GROUP BY p.name ORDER BY revenue DESC`,[TODAY]);
-  const max = Math.max(1, ...by.map(b=>b.revenue));
-  $('#salesBars').innerHTML = by.map(b => `<div class="sb"><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(b.name)}</span><div class="track"><span style="width:${b.revenue/max*100}%"></span></div><span class="num" style="text-align:right">${rupee(b.revenue)}</span></div>`).join('') || '<p class="muted" style="margin:0">No sales yet today.</p>';
-  $('#salesBody').innerHTML = q(`SELECT s.time, p.name, s.qty, s.amount FROM sales s JOIN products p ON s.product_id = p.id WHERE s.day = ? ORDER BY s.id DESC`,[TODAY])
-    .map(r => `<tr><td class="num" data-label="Time">${r.time}</td><td data-label="Item">${esc(r.name)}</td><td class="r num" data-label="Qty">${r.qty}</td><td class="r num" data-label="Amount">${rupee(r.amount)}</td></tr>`).join('');
+/* ---------- cake orders ---------- */
+function dueLabel(o){
+  const d = daysUntil(o.due_day);
+  if (d < 0) return pill('bad', `${t('Overdue')} · ${niceDate(o.due_day)}`);
+  if (d === 0) return pill('bad', `${t('Today')} ${time12(o.due_time)}`);
+  if (d === 1) return pill('warn', `${t('Tomorrow')} ${time12(o.due_time)}`);
+  return pill('info', `${niceDate(o.due_day)} ${time12(o.due_time)}`);
+}
+function renderCakes(){
+  const list = C.cakeOrders();
+  $('#cakeList').innerHTML = list.length ? list.map(o => {
+    const bal = o.amount - o.advance;
+    const readyMsg = `Hi ${o.customer}, your ${o.item} from Noor Bakery is ready for pickup.${bal > 0 ? ` Balance to pay: ${rupee(bal)}.` : ''} Thank you!`;
+    return `<div class="card order">
+      <div class="top"><div><strong>${esc(o.customer)}</strong><div class="muted" style="font-size:.8rem">${esc(o.phone)}</div></div>${dueLabel(o)}</div>
+      <div>${esc(o.item)} · ${o.weight_kg} kg ${o.status === 'ready' ? pill('ok', t('Ready')) : pill('warn', t('Pending'))}</div>
+      ${o.cake_text ? `<div class="cake-text">“${esc(o.cake_text)}”</div>` : ''}
+      <div class="money"><span>${esc(t('Price'))}<b>${rupee(o.amount)}</b></span><span>${esc(t('Advance'))}<b>${rupee(o.advance)}</b></span><span>${esc(t('Balance'))}<b style="color:${bal>0?'var(--bad)':'var(--ok)'}">${rupee(bal)}</b></span></div>
+      <div class="acts">
+        ${o.status === 'pending' ? `<button class="btn small" type="button" data-cake="${o.id}" data-st="ready">${esc(t('Mark ready'))}</button>` : `<a class="btn small wa" target="_blank" rel="noopener" href="${esc(waLink(o.phone, readyMsg))}">${esc(t('Tell customer'))}</a>`}
+        <button class="btn small primary" type="button" data-cake="${o.id}" data-st="delivered">${esc(t('Delivered'))}</button>
+      </div>
+    </div>`;
+  }).join('') : `<p class="empty">${LANG==='ta'?'நிலுவையில் ஆர்டர்கள் இல்லை.':'No open cake orders.'}</p>`;
+  const done = C.deliveredCakes();
+  $('#cakeDone').innerHTML = done.length ? done.map(o => `<div><span>${niceDate(o.due_day)} · ${esc(o.customer)} · ${esc(o.item)}</span><span class="num">${rupee(o.amount)}</span></div>`).join('') : `<p class="empty">—</p>`;
 }
 
+/* ---------- reports ---------- */
+function closingText(c){
+  const L = [`NOOR BAKERY – closing report`, new Date(TODAY+'T00:00:00').toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'}), ''];
+  L.push(`Sales: ${rupee(c.amount)} (${c.bills} bills, ${c.items} items)`);
+  c.byPay.forEach(p => L.push(`  ${p.payment}: ${rupee(p.amt)}`));
+  L.push(`GST collected: ${rupee2(c.tax)}`);
+  if (c.advance) L.push(`Cake advances: ${rupee(c.advance)}`);
+  L.push(`Waste: ${rupee(c.wasteValue)}`);
+  if (c.top.length) { L.push(''); L.push('Top sellers:'); c.top.slice(0,3).forEach(x => L.push(`  ${x.name} – ${x.sold} pcs`)); }
+  const plan = C.bakeTomorrow().filter(b => b.need);
+  if (plan.length){ L.push(''); L.push('Bake tomorrow:'); plan.forEach(b => L.push(`  ${b.name} – ${b.need} pcs`)); }
+  const low = C.q('SELECT name FROM ingredients WHERE qty <= reorder_level');
+  if (low.length){ L.push(''); L.push('Reorder: ' + low.map(x => x.name).join(', ')); }
+  return L.join('\n');
+}
+function renderReports(){
+  const c = C.closing(TODAY);
+  $('#closingDate').textContent = new Date(TODAY+'T00:00:00').toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  $('#closingKpis').innerHTML = [
+    [t("Today's sales"), rupee(c.amount)], [t('Bills'), c.bills], [t('Items sold'), c.items],
+    [t('GST collected'), rupee2(c.tax)], [t('Cake advances'), rupee(c.advance)], [t('Waste today'), rupee(c.wasteValue)],
+  ].map(([k,v]) => `<div class="kpi"><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join('');
+  $('#closingPay').innerHTML = `<strong>${esc(t('By payment'))}</strong>` + (c.byPay.map(p => `<div><span>${esc(p.payment === 'Cash' ? t('Cash') : p.payment === 'Card' ? t('Card') : p.payment)} · ${p.bills}</span><span class="num">${rupee(p.amt)}</span></div>`).join('') || `<p class="empty">${esc(t('No sales yet today.'))}</p>`);
+  $('#closingTop').innerHTML = `<strong>${esc(t('Top sellers'))}</strong>` + (c.top.slice(0,4).map(x => `<div><span>${esc(nm(x))} · ${x.sold}</span><span class="num">${rupee(x.revenue)}</span></div>`).join('') || `<p class="empty">${esc(t('No sales yet today.'))}</p>`);
+  const txt = closingText(c);
+  $('#closingWa').href = waLink('', txt);
+  $('#closingShare').textContent = IN_APP ? t('Share') : t('Copy text');
+  $('#closingShare').onclick = () => shareText(txt);
+
+  // weekly chart (SVG, one scale)
+  const wk = C.weekly();
+  const W = 640, H = 230, padL = 52, padR = 12, padT = 26, padB = 36;
+  const max = Math.max(...wk.map(d => d.amount), 1);
+  const step = max > 4000 ? 2000 : max > 2000 ? 1000 : 500;
+  const top = Math.ceil(max / step) * step;
+  const y = v => padT + (H - padT - padB) * (1 - v / top);
+  const bw = (W - padL - padR) / wk.length;
+  let g = '';
+  for (let v = 0; v <= top; v += step) g += `<line x1="${padL}" x2="${W-padR}" y1="${y(v)}" y2="${y(v)}" style="stroke:var(--line)" stroke-width="1"/><text x="${padL-8}" y="${y(v)+4}" text-anchor="end" font-size="11" style="fill:var(--muted)">${v>=1000? (v/1000)+'k' : v}</text>`;
+  wk.forEach((d, i) => {
+    const x = padL + i * bw + bw * 0.18, w2 = bw * 0.64, h = (H - padT - padB) - (y(d.amount) - padT);
+    const isToday = d.day === TODAY;
+    const lbl = new Date(d.day+'T00:00:00').toLocaleDateString(LANG==='ta'?'ta-IN':'en-IN',{weekday:'short'});
+    g += `<rect x="${x}" y="${y(d.amount)}" width="${w2}" height="${Math.max(0,h)}" rx="4" style="fill:var(--accent);opacity:${isToday?1:.45}"><title>${niceDate(d.day)}: ${rupee(d.amount)} (${d.bills} bills)</title></rect>`;
+    g += `<text x="${x + w2/2}" y="${y(d.amount)-6}" text-anchor="middle" font-size="11" style="fill:var(--ink)" font-weight="600">${d.amount>=1000 ? (d.amount/1000).toFixed(1)+'k' : Math.round(d.amount)}</text>`;
+    g += `<text x="${x + w2/2}" y="${H-14}" text-anchor="middle" font-size="11" style="fill:${isToday?'var(--ink)':'var(--muted)'}" font-weight="${isToday?700:400}">${esc(isToday ? t('Today') : lbl)}</text>`;
+  });
+  const avg = wk.slice(0,6).reduce((a,d)=>a+d.amount,0)/6;
+  $('#weekChart').innerHTML = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Sales in rupees, last 7 days">${g}</svg>
+    <p class="muted" style="margin:0;font-size:.85rem">${LANG==='ta'?'சராசரி (முந்தைய 6 நாள்)':'Average of the previous 6 days'}: <strong>${rupee(avg)}</strong>. ${LANG==='ta'?'இன்றைய எண் இதுவரை உள்ள விற்பனை மட்டும்.':'Today shows sales so far.'}</p>`;
+
+  // profit
+  const pr = C.profit();
+  $('#profitBody').innerHTML = pr.map(p => {
+    const col = p.pct < 20 ? 'var(--bad)' : p.pct < 35 ? 'var(--warn)' : 'var(--ok)';
+    return `<tr><td><div class="item-name">${esc(nm(p))}</div><div class="muted">GST ${p.gst_rate}%</div></td>
+      <td class="r num" data-label="${esc(t('Price'))}">${rupee(p.price)}</td>
+      <td class="r num" data-label="${esc(t('After GST'))}">${rupee2(p.net)}</td>
+      <td class="r num" data-label="${esc(t('Ingredient cost'))}">${rupee2(p.unit)}</td>
+      <td class="r num" data-label="${esc(t('Profit / pc'))}"><strong>${rupee2(p.margin)}</strong></td>
+      <td data-label="${esc(t('Margin'))}"><div style="display:flex;align-items:center;gap:8px;justify-content:flex-end;flex:1"><div class="margin-bar" style="flex:1"><span style="width:${Math.max(3,Math.min(100,p.pct))}%;background:${col}"></span></div><span class="num" style="color:${col};font-weight:600;min-width:38px;text-align:right">${p.pct.toFixed(0)}%</span></div></td></tr>`;
+  }).join('');
+
+  // waste
+  const ws = C.wasteReport(7);
+  $('#wasteBody').innerHTML = ws.length ? ws.map(x => `<tr><td><div class="item-name">${esc(nm(C.q('SELECT name, name_ta FROM products WHERE name = ?',[x.item])[0] || {name:x.item}))}</div></td>
+    <td class="r num" data-label="${esc(t('Wasted'))}">${x.pcs} pcs</td>
+    <td class="r num" data-label="${esc(t('Sold'))}">${x.sold} pcs</td>
+    <td class="r num" data-label="${esc(t('Waste rate'))}"><span style="color:${x.rate>5?'var(--bad)':'var(--ink)'}">${x.rate.toFixed(1)}%</span></td>
+    <td class="r num" data-label="${esc(t('Loss'))}"><strong>${rupee(x.loss)}</strong></td></tr>`).join('') : `<tr><td class="muted">—</td></tr>`;
+  const worst = ws[0];
+  $('#wasteTip').textContent = worst ? (LANG==='ta'
+    ? `அதிக இழப்பு: ${worst.item} (${rupee(worst.loss)}). நாளை சற்று குறைவாகத் தயாரிக்கவும் அல்லது மாலையில் தள்ளுபடி கொடுக்கவும்.`
+    : `Biggest loss: ${worst.item} (${rupee(worst.loss)} in 7 days). Bake a little less, or offer an evening discount before it expires.`) : '';
+}
+
+/* ---------- history ---------- */
 function renderHistory(){
-  const kinds = {in:['ok','Received'], bake:['ok','Baked'], sale:['warn','Sold'], waste:['bad','Wasted']};
-  $('#histBody').innerHTML = q('SELECT * FROM movements ORDER BY id DESC').map(r => {
+  const kinds = {in:['ok','Received'], bake:['ok','Baked'], sale:['warn','Sold'], waste:['bad','Wasted ']};
+  $('#histBody').innerHTML = C.q('SELECT * FROM movements ORDER BY id DESC LIMIT 80').map(r => {
     const k = kinds[r.kind] || ['ok', r.kind];
-    return `<tr><td class="num" data-label="When">${r.day===TODAY?'Today':niceDate(r.day)} ${r.time}</td><td data-label="Item">${esc(r.item)}</td><td data-label="Type">${pill(k[0],k[1])}</td><td class="r num" data-label="Change">${r.delta>0?'+':''}${qtyFmt(r.delta,r.unit)}</td><td class="muted" data-label="Note">${esc(r.note)}</td></tr>`;
+    return `<tr><td class="num">${r.day===TODAY?t('Today'):niceDate(r.day)} ${r.time}</td><td data-label="${esc(t('Item'))}">${esc(r.item)}</td><td data-label="${esc(t('Type'))}">${pill(k[0],t(k[1]))}</td><td class="r num" data-label="${esc(t('Change'))}">${r.delta>0?'+':''}${qtyFmt(r.delta,r.unit)}</td><td class="muted" data-label="${esc(t('Note'))}">${esc(r.note)}</td></tr>`;
   }).join('');
 }
 
+/* ---------- SQL log & console ---------- */
 function highlight(sql){
   return esc(sql)
     .replace(/(&#39;.*?&#39;)/g,'<span class="str">$1</span>')
-    .replace(/\b(SELECT|FROM|WHERE|AND|OR|INSERT|INTO|VALUES|UPDATE|SET|DELETE|JOIN|ON|ORDER BY|GROUP BY|SUM|MIN|MAX|COUNT|ROUND|AS)\b/g,'<span class="kw">$1</span>');
+    .replace(/\b(SELECT|FROM|WHERE|AND|OR|INSERT|INTO|VALUES|UPDATE|SET|DELETE|JOIN|ON|ORDER BY|GROUP BY|SUM|MIN|MAX|COUNT|ROUND|AS|LIMIT)\b/g,'<span class="kw">$1</span>');
 }
 function renderLog(){
-  if (!LOG.length){ $('#log').innerHTML = '<p class="empty-log">Nothing yet. Try selling a Veg puff.</p>'; return; }
-  $('#log').innerHTML = LOG.map((s,i) => `<pre class="${i<freshCount?'fresh':''}">${highlight(s)}</pre>`).join('');
+  if (!C.LOG.length){ $('#log').innerHTML = `<p class="empty-log">${LANG==='ta'?'இன்னும் எதுவும் இல்லை. ஒரு பில் போட்டுப் பாருங்கள்.':'Nothing yet. Try making a bill.'}</p>`; freshCount = 0; return; }
+  $('#log').innerHTML = C.LOG.slice(0, 30).map((s,i) => `<pre class="${i<freshCount?'fresh':''}">${highlight(s)}</pre>`).join('');
   freshCount = 0;
 }
-
-function renderAll(){
-  saveDb();
-  renderFigures(); renderAlerts(); renderIngredients(); renderProducts(); renderBake(); renderSales(); renderHistory(); renderLog();
-  const lowN = q('SELECT COUNT(*) AS c FROM ingredients WHERE qty <= reorder_level')[0].c;
-  const ingTab = document.querySelector('[data-tab="ingredients"]');
-  ingTab.innerHTML = 'Ingredients' + (lowN ? `<span class="count">${lowN}</span>` : '');
-}
-
-let toastTimer;
-function toast(msg){ const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.hidden=true, 2600); }
-
-function showTab(name){
-  document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', t.dataset.tab===name ? 'true':'false'));
-  document.querySelectorAll('[data-panel]').forEach(p => p.hidden = p.dataset.panel !== name);
-}
-
-/* ---------- SQL console ---------- */
 const EXAMPLES = () => [
   ['Low stock', `SELECT name, qty, unit, reorder_level\nFROM ingredients\nWHERE qty <= reorder_level;`],
-  ['Expiring in 3 days', `SELECT name, qty, unit, expiry\nFROM ingredients\nWHERE expiry <= '${dayOffset(3)}'\nORDER BY expiry;`],
   ["Today's best sellers", `SELECT p.name, SUM(s.qty) AS sold, SUM(s.amount) AS revenue\nFROM sales s JOIN products p ON s.product_id = p.id\nWHERE s.day = '${TODAY}'\nGROUP BY p.name\nORDER BY revenue DESC;`],
-  ['Counter by batch', `SELECT p.name, b.qty, b.made_on, b.best_before\nFROM batches b JOIN products p ON b.product_id = p.id\nORDER BY b.best_before;`],
+  ['Sales by payment', `SELECT payment, COUNT(*) AS bills, SUM(amount) AS amount\nFROM bills\nWHERE day = '${TODAY}'\nGROUP BY payment;`],
+  ['Busiest hours (7 days)', `SELECT SUBSTRING(time, 1, 2) AS hour, COUNT(*) AS bills, SUM(amount) AS amount\nFROM bills\nGROUP BY SUBSTRING(time, 1, 2)\nORDER BY hour;`],
+  ['Cake orders due', `SELECT customer, item, weight_kg, due_day, due_time,\n       amount - advance AS balance\nFROM cake_orders\nWHERE status <> 'delivered'\nORDER BY due_day, due_time;`],
   ['Cost to bake 1 batch', `SELECT p.name, SUM(r.qty * i.cost) AS ingredient_cost,\n       p.price * p.batch_yield AS sales_value\nFROM recipes r\nJOIN ingredients i ON r.ingredient_id = i.id\nJOIN products p ON r.product_id = p.id\nGROUP BY p.name, p.price, p.batch_yield;`],
-  ['Stock value by supplier', `SELECT supplier, SUM(qty * cost) AS stock_value\nFROM ingredients\nGROUP BY supplier\nORDER BY stock_value DESC;`],
+  ['Counter by batch', `SELECT p.name, b.qty, b.made_on, b.best_before\nFROM batches b JOIN products p ON b.product_id = p.id\nORDER BY b.best_before;`],
 ];
 function runConsole(){
   const sql = $('#sqlInput').value.trim().replace(/;\s*$/,'');
   const errEl = $('#sqlErr'); errEl.hidden = true;
   if (!sql) return;
   try{
-    const res = q(sql, [], true);
+    const res = C.q(sql, [], true);
     const out = $('#sqlResult');
     if (Array.isArray(res) && res.length && typeof res[0] === 'object'){
       const cols = Object.keys(res[0]);
-      out.innerHTML = `<table><thead><tr>${cols.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${res.map(r=>`<tr>${cols.map(c=>{const v=r[c]; return `<td class="num">${typeof v==='number'? esc(Math.round(v*100)/100) : esc(v ?? '')}</td>`;}).join('')}</tr>`).join('')}</tbody></table>`;
-    } else if (Array.isArray(res)) {
-      out.innerHTML = `<p class="muted" style="margin:0;padding:12px">No rows matched.</p>`;
-    } else {
-      out.innerHTML = `<p class="muted" style="margin:0;padding:12px">Done. ${esc(res)} row(s) changed.</p>`;
-    }
+      out.innerHTML = `<table><thead><tr>${cols.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${res.slice(0,200).map(r=>`<tr>${cols.map(c=>{const v=r[c]; return `<td class="num">${typeof v==='number'? esc(Math.round(v*100)/100) : esc(v ?? '')}</td>`;}).join('')}</tr>`).join('')}</tbody></table>`;
+    } else if (Array.isArray(res)) out.innerHTML = `<p class="muted" style="margin:0;padding:12px">No rows matched.</p>`;
+    else out.innerHTML = `<p class="muted" style="margin:0;padding:12px">Done. ${esc(res)} row(s) changed.</p>`;
     renderAll();
   }catch(e){ errEl.textContent = 'The database could not run that query: ' + e.message; errEl.hidden = false; }
 }
 
-/* ---------- events ---------- */
-$('#tabs').addEventListener('click', e => { const t = e.target.closest('.tab'); if (t) showTab(t.dataset.tab); });
-document.addEventListener('click', e => {
-  const s = e.target.closest('[data-sell]');
-  if (s){ const id = +s.dataset.sell; const n = Math.max(1, Math.floor(+$('#sellQty'+id).value || 1)); sell(id, n); renderAll(); return; }
-  const g = e.target.closest('[data-goto]'); if (g){ showTab(g.dataset.goto); return; }
-  const r = e.target.closest('[data-receive]');
-  if (r){ showTab('ingredients'); const opt = [...$('#rcvItem').options].find(o => o.textContent.startsWith(r.dataset.receive)); if (opt) $('#rcvItem').value = opt.value; $('#rcvQty').focus(); }
+/* ---------- render all ---------- */
+function renderAll(){
+  saveDb();
+  if (ROLE === 'Owner'){ renderFigures(); renderIngredients(); renderReports(); renderHistory(); }
+  renderAlerts(); renderTiles(); renderCart(); renderProducts(); renderBake(); renderCakes(); renderLog();
+  const lowN = C.q('SELECT COUNT(*) AS c FROM ingredients WHERE qty <= reorder_level')[0].c;
+  const ingTab = document.querySelector('[data-tab="ingredients"]');
+  ingTab.innerHTML = esc(t('Ingredients')) + (lowN ? `<span class="count">${lowN}</span>` : '');
+}
+function showTab(name){
+  const tab = document.querySelector(`.tab[data-tab="${name}"]`);
+  if (!tab || getComputedStyle(tab).display === 'none') name = 'billing';
+  $$('.tab').forEach(x => x.setAttribute('aria-selected', x.dataset.tab===name ? 'true':'false'));
+  $$('[data-panel]').forEach(p => p.hidden = p.dataset.panel !== name);
+  try { localStorage.setItem('noor-tab', name); } catch(e){}
+}
+
+/* ---------- lock ---------- */
+let pickRole = 'Owner';
+const PINS = { Owner: '1234', Staff: '0000' };
+$('#roleSeg').addEventListener('click', e => { const b = e.target.closest('[data-role]'); if (!b) return; pickRole = b.dataset.role; $$('#roleSeg button').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true':'false')); $('#pinInput').focus(); });
+$('#pinForm').addEventListener('submit', e => {
+  e.preventDefault();
+  if ($('#pinInput').value !== PINS[pickRole]){ $('#pinErr').textContent = t('Wrong PIN. Try again.'); $('#pinInput').value=''; return; }
+  ROLE = pickRole; document.body.dataset.role = ROLE;
+  $('#whoLabel').textContent = t(ROLE);
+  $('#lock').hidden = true; $('#pinInput').value = ''; $('#pinErr').textContent = '';
+  renderAll(); showTab('billing');
 });
-$('#receiveForm').addEventListener('submit', e => { e.preventDefault(); const qty = +$('#rcvQty').value; if (qty>0){ receive(+$('#rcvItem').value, qty, $('#rcvExp').value); renderAll(); }});
+$('#lockBtn').addEventListener('click', () => { cart.clear(); $('#lock').hidden = false; setTimeout(()=>$('#pinInput').focus(), 50); });
+
+/* ---------- events ---------- */
+$('#tabs').addEventListener('click', e => { const x = e.target.closest('.tab'); if (x) showTab(x.dataset.tab); });
+$$('[data-lang-toggle]').forEach(b => b.addEventListener('click', () => {
+  LANG = LANG === 'ta' ? 'en' : 'ta'; try { localStorage.setItem('noor-lang', LANG); } catch(e){}
+  applyLang(); $('#whoLabel').textContent = t(ROLE); renderAll();
+}));
+document.addEventListener('click', e => {
+  const a = e.target.closest('[data-add]'); if (a){ addToCart(+a.dataset.add, 1); return; }
+  const inc = e.target.closest('[data-inc]'); if (inc){ addToCart(+inc.dataset.inc, 1); return; }
+  const dec = e.target.closest('[data-dec]'); if (dec){ const id = +dec.dataset.dec; const n = (cart.get(id)||0) - 1; n > 0 ? cart.set(id, n) : cart.delete(id); renderTiles(); renderCart(); return; }
+  const s = e.target.closest('[data-sell]');
+  if (s){ const id = +s.dataset.sell; const n = Math.max(1, Math.floor(+$('#sellQty'+id).value || 1)); const b = doCheckout([{pid:id, qty:n}], {payment:'Cash'}); if (b){ renderAll(); toast(`${b.bill_no}: ${n} × ${nm(b.items[0])} · ${rupee(b.amount)}`); } return; }
+  const bc = e.target.closest('[data-barcode]'); if (bc){ showBarcode(+bc.dataset.barcode); return; }
+  const g = e.target.closest('[data-goto]'); if (g){ showTab(g.dataset.goto); return; }
+  const po = e.target.closest('[data-po]'); if (po){ const plan = PLANS[+po.dataset.po]; if (plan){ C.createPO(plan); setTimeout(() => { renderAll(); toast(`${t('Order sent')}: ${plan.supplier}`); }, 300); } return; }
+  const pr = e.target.closest('[data-porecv]'); if (pr){ const p = C.receivePO(+pr.dataset.porecv); if (p){ renderAll(); toast(`${t('Received')}: ${p.supplier}`); } return; }
+  const ck = e.target.closest('[data-cake]'); if (ck){ C.setCakeStatus(+ck.dataset.cake, ck.dataset.st); renderAll(); toast(ck.dataset.st === 'ready' ? t('Ready') : t('Delivered')); return; }
+  const pl = e.target.closest('[data-plan]'); if (pl){ $('#bakeItem').value = pl.dataset.plan; $('#bakeN').value = pl.dataset.batches; renderBake(); $('#bakeForm').scrollIntoView({behavior:'smooth', block:'center'}); return; }
+});
+$('#paySeg').addEventListener('click', e => { const b = e.target.closest('[data-pay]'); if (b){ PAY = b.dataset.pay; renderCart(); } });
+$('#clearCart').addEventListener('click', () => { cart.clear(); renderTiles(); renderCart(); });
+$('#checkoutBtn').addEventListener('click', () => {
+  const lines = [...cart.entries()].map(([pid, qty]) => ({pid, qty}));
+  const b = doCheckout(lines, { customer: $('#custName').value.trim(), phone: $('#custPhone').value.trim(), payment: PAY });
+  if (!b) return;
+  cart.clear(); $('#custName').value = ''; $('#custPhone').value = '';
+  renderAll(); showReceipt(b);
+});
+$('#scanBtn').addEventListener('click', startScan);
+$('#codeAdd').addEventListener('click', () => { const v = $('#codeInput').value.trim(); if (v){ handleCode(v); $('#codeInput').value = ''; } });
+$('#codeInput').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); $('#codeAdd').click(); } });
+$('#receiveForm').addEventListener('submit', e => { e.preventDefault(); const qty = +$('#rcvQty').value; if (qty>0){ const ing = C.receive(+$('#rcvItem').value, qty, $('#rcvExp').value); renderAll(); toast(`+${qtyFmt(qty, ing.unit)} ${nm(ing)}`); }});
 $('#newIngForm').addEventListener('submit', e => { e.preventDefault();
-  addIngredient({name:$('#niName').value.trim(), unit:$('#niUnit').value, qty:+$('#niQty').value, reorder:+$('#niReorder').value, cost:+$('#niCost').value, expiry:$('#niExp').value});
-  $('#niName').value=''; renderAll(); });
-$('#bakeForm').addEventListener('submit', e => { e.preventDefault(); bake(+$('#bakeItem').value, Math.max(1, Math.floor(+$('#bakeN').value||1))); renderAll(); });
+  C.addIngredient({name:$('#niName').value.trim(), unit:$('#niUnit').value, qty:+$('#niQty').value, reorder:+$('#niReorder').value, cost:+$('#niCost').value, expiry:$('#niExp').value, supplier:$('#niSupplier').value});
+  toast(`${$('#niName').value.trim()} ✓`); $('#niName').value=''; renderAll(); });
+$('#bakeForm').addEventListener('submit', e => { e.preventDefault();
+  const r = C.bake(+$('#bakeItem').value, Math.max(1, Math.floor(+$('#bakeN').value||1)));
+  if (!r.ok){ toast(`${t('Short by')}: ${r.short.map(s=>nm(s)).join(', ')}`); return; }
+  renderAll(); toast(`${t('Baked')}: ${r.made} × ${nm(r.product)}`); });
 $('#bakeItem').addEventListener('change', renderBake);
 $('#bakeN').addEventListener('input', renderBake);
-$('#writeOffBtn').addEventListener('click', () => { writeOff(); renderAll(); });
+$('#writeOffBtn').addEventListener('click', () => { const r = C.writeOff(); renderAll(); toast(r.count ? `${r.count} pcs removed · ${rupee(r.loss)}` : (LANG==='ta'?'காலாவதியானவை இல்லை':'No expired stock on the counter')); });
+$('#cakeForm').addEventListener('submit', e => { e.preventDefault();
+  C.addCakeOrder({ customer:$('#ckName').value.trim(), phone:$('#ckPhone').value.trim(), item:$('#ckItem').value.trim(), weight:+$('#ckKg').value, text:$('#ckText').value.trim(), due_day:$('#ckDay').value, due_time:$('#ckTime').value, amount:+$('#ckAmt').value, advance:+$('#ckAdv').value });
+  ['#ckName','#ckPhone','#ckItem','#ckText'].forEach(s => $(s).value = ''); $('#cakeFormBox').open = false;
+  renderAll(); toast(t('Save order') + ' ✓'); });
 $('#runSql').addEventListener('click', runConsole);
 $('#sqlInput').addEventListener('keydown', e => { if ((e.ctrlKey||e.metaKey) && e.key==='Enter') runConsole(); });
-$('#clearLog').addEventListener('click', () => { LOG.length = 0; renderLog(); });
-$('#resetBtn').addEventListener('click', () => { seed(); LOG.length = 0; renderAll(); toast('Demo data reset'); });
+$('#clearLog').addEventListener('click', () => { C.LOG.length = 0; renderLog(); });
+let resetArmed = false;
+$('#resetBtn').addEventListener('click', () => {
+  if (!resetArmed){ resetArmed = true; $('#resetBtn').textContent = LANG==='ta' ? 'உறுதியா? மீண்டும் தொடவும்' : 'Tap again to reset'; setTimeout(() => { resetArmed = false; $('#resetBtn').textContent = t('Reset demo data'); }, 3000); return; }
+  resetArmed = false; $('#resetBtn').textContent = t('Reset demo data');
+  C.seed(); C.LOG.length = 0; cart.clear(); renderAll(); toast('Demo data reset');
+});
 
 /* ---------- start ---------- */
 $('#todayLabel').textContent = new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
-$('#rcvExp').value = dayOffset(30); $('#niExp').value = dayOffset(90);
-$('#schemaText').textContent = SCHEMA;
+$('#rcvExp').value = dayOffset(30); $('#niExp').value = dayOffset(90); $('#ckDay').value = dayOffset(2);
+$('#schemaText').textContent = C.SCHEMA;
 $('#chips').innerHTML = EXAMPLES().map((x,i)=>`<button class="chip" type="button" data-ex="${i}">${esc(x[0])}</button>`).join('');
 $('#chips').addEventListener('click', e => { const c = e.target.closest('[data-ex]'); if (c){ $('#sqlInput').value = EXAMPLES()[+c.dataset.ex][1]; runConsole(); }});
 $('#sqlInput').value = EXAMPLES()[0][1];
-
-if (!window.alasql){ $('#alerts').innerHTML = '<div class="alert-row bad"><span class="what">The database engine did not load. Check your internet connection and reload the page.</span></div>'; return; }
-if (IN_APP) $('#footNote').textContent = 'Demo data. Prices in ₹. Everything is saved on this phone. Tap "Reset demo data" to start fresh.';
-if (!loadDb()) seed();
-renderAll(); runConsole(); LOG.length = 0; renderLog();
+if (IN_APP) $('#footNote').textContent = 'Demo data. Prices in ₹. Everything is saved on this phone. Owner can tap "Reset demo data" to start fresh.';
+document.body.dataset.role = ROLE;
+applyLang();
+if (!window.alasql){ $('#alerts').innerHTML = '<div class="alert-row bad"><span class="what">The database engine did not load. Check your internet connection and reload.</span></div>'; return; }
+if (!loadDb()) C.seed();
+C.LOG.length = 0;
+$('#whoLabel').textContent = t(ROLE);
+renderAll(); runConsole(); C.LOG.length = 0; renderLog();
+showTab('billing');
+setTimeout(() => { try { $('#pinInput').focus(); } catch(e){} }, 100);
 })();
 </script>
