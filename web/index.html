@@ -153,6 +153,9 @@ td .muted{font-size:.8rem}
 .totals .grand{display:flex;justify-content:space-between;font-family:var(--display);font-size:1.4rem;font-weight:700}
 .totals .taxline{display:flex;justify-content:space-between;font-size:.82rem;color:var(--muted)}
 .empty{font-size:.88rem;color:var(--muted);margin:0}
+.search{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);font-size:.95rem}
+tr.billrow{cursor:pointer}
+tr.billrow:hover td{background:var(--sunk)}
 
 /* Cake orders */
 .orders{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
@@ -299,6 +302,7 @@ footer{font-size:.8rem;color:var(--muted)}
 
   <nav class="tabs" role="tablist" id="tabs">
     <button class="tab" role="tab" data-tab="billing" aria-selected="true" data-t="Billing">Billing</button>
+    <button class="tab" role="tab" data-tab="bills" aria-selected="false" data-t="Bill history">Bill history</button>
     <button class="tab" role="tab" data-tab="products" aria-selected="false" data-t="Bakery items">Bakery items</button>
     <button class="tab owner-only" role="tab" data-tab="ingredients" aria-selected="false" data-t="Ingredients">Ingredients</button>
     <button class="tab" role="tab" data-tab="bake" aria-selected="false" data-t="Bake">Bake</button>
@@ -339,6 +343,27 @@ footer{font-size:.8rem;color:var(--muted)}
             <button class="linkbtn" type="button" id="clearCart" data-t="Clear bill">Clear bill</button>
           </div>
         </div>
+      </section>
+
+      <!-- Bill history -->
+      <section class="panel" data-panel="bills" hidden>
+        <div class="panel-head">
+          <div><h2 data-t="Bill history">Bill history</h2><p data-t="Every bill with its items. Tap a bill to see the receipt or send it again.">Every bill with its items. Tap a bill to see the receipt or send it again.</p></div>
+        </div>
+        <div class="card" style="gap:10px">
+          <input id="billSearch" class="search" type="search" autocomplete="off" data-tp="Search bill number, customer or phone" placeholder="Search bill number, customer or phone" aria-label="Search bills">
+          <div class="seg owner-only" id="billRange">
+            <button type="button" data-range="today" aria-pressed="true" data-t="Today">Today</button>
+            <button type="button" data-range="yesterday" aria-pressed="false" data-t="Yesterday">Yesterday</button>
+            <button type="button" data-range="week" aria-pressed="false" data-t="7 days">7 days</button>
+            <button type="button" data-range="all" aria-pressed="false" data-t="All">All</button>
+          </div>
+          <p class="muted" style="margin:0;font-size:.88rem" id="billSummary"></p>
+        </div>
+        <div class="table-wrap"><table class="cards">
+          <thead><tr><th data-t="Bill">Bill</th><th data-t="Customer">Customer</th><th data-t="Items">Items</th><th data-t="Paid by">Paid by</th><th class="r" data-t="Amount">Amount</th><th></th></tr></thead>
+          <tbody id="billBody"></tbody>
+        </table></div>
       </section>
 
       <!-- Products -->
@@ -801,6 +826,26 @@ function productByBarcode(code) {
   return q('SELECT * FROM products WHERE barcode = ?', [String(code).trim()])[0] || null;
 }
 
+function billList(f) {
+  const term = '%' + String(f.search || '').trim().toLowerCase() + '%';
+  const rows = q(`SELECT * FROM bills WHERE day >= ? AND day <= ?
+                  AND (LOWER(bill_no) LIKE ? OR LOWER(customer) LIKE ? OR phone LIKE ?)
+                  ORDER BY id DESC LIMIT 300`, [f.from, f.to, term, term, term]);
+  const sum = q(`SELECT COUNT(*) AS n, SUM(amount) AS amt FROM bills WHERE day >= ? AND day <= ?
+                 AND (LOWER(bill_no) LIKE ? OR LOWER(customer) LIKE ? OR phone LIKE ?)`, [f.from, f.to, term, term, term])[0];
+  rows.forEach(b => {
+    b.items = q(`SELECT p.name, p.name_ta, s.qty FROM sales s JOIN products p ON s.product_id = p.id WHERE s.bill_id = ? ORDER BY s.id`, [b.id]);
+  });
+  return { rows, count: sum.n || 0, amount: sum.amt || 0 };
+}
+function billDetail(id) {
+  const b = q('SELECT * FROM bills WHERE id = ?', [id])[0];
+  if (!b) return null;
+  b.items = q(`SELECT p.id AS pid, p.name, p.name_ta, p.price, p.gst_rate, s.qty, s.amount FROM sales s JOIN products p ON s.product_id = p.id
+               WHERE s.bill_id = ? ORDER BY s.id`, [id]).map(i => ({ ...i, tax: i.amount * i.gst_rate / (100 + i.gst_rate) }));
+  return b;
+}
+
 /* ---------------- purchase orders ---------------- */
 function suggestQty(i) {
   let need = i.reorder_level * 2 - i.qty;
@@ -916,7 +961,7 @@ root.Core = {
   get db() { return db; }, set onLog(f) { onLog = f; },
   q, w, seed, dump, restore,
   receive, addIngredient, recipeNeeds, bake, freshStock, writeOff,
-  checkout, productByBarcode,
+  checkout, productByBarcode, billList, billDetail,
   reorderPlan, createPO, receivePO, pendingPOs, sentToday,
   addCakeOrder, setCakeStatus, cakeOrders, deliveredCakes,
   closing, weekly, profit, wasteReport, bakeTomorrow,
@@ -964,7 +1009,7 @@ const TA = {
  "Reorder":"ஆர்டர் செய்","Use soon":"விரைவில் பயன்படுத்து","Expired":"காலாவதி","OK":"சரி","Sell today":"இன்றே விற்கவும்","Bake soon":"விரைவில் தயாரிக்கவும்","expired":"காலாவதி",
  "Received":"பெறப்பட்டது","Baked":"தயாரிக்கப்பட்டது","Wasted ":"வீணானது",
  "Order from suppliers":"சப்ளையர்களிடம் ஆர்டர்","Send order on WhatsApp":"வாட்ஸ்அப்பில் ஆர்டர் அனுப்பு","Order sent":"ஆர்டர் அனுப்பப்பட்டது","Mark received":"பெறப்பட்டது எனக் குறி","Waiting for delivery":"டெலிவரிக்காக காத்திருக்கிறது","All ingredients are above their reorder level.":"எல்லா மூலப்பொருட்களும் போதுமான அளவில் உள்ளன.","est.":"சுமார்",
- "Bills":"பில்கள்","Items sold":"விற்ற பொருட்கள்","GST collected":"வசூலித்த GST","Cake advances":"கேக் முன்பணம்","Waste today":"இன்று வீணானது","By payment":"கட்டண முறைப்படி","Top sellers":"அதிகம் விற்றவை",
+ "Bills":"பில்கள்","Bill history":"பில் வரலாறு","Every bill with its items. Tap a bill to see the receipt or send it again.":"ஒவ்வொரு பில்லும் அதன் பொருட்களுடன். ரசீதைப் பார்க்க அல்லது மீண்டும் அனுப்ப பில்லைத் தொடவும்.","Search bill number, customer or phone":"பில் எண், வாடிக்கையாளர் அல்லது தொலைபேசி தேடு","Yesterday":"நேற்று","7 days":"7 நாள்","All":"அனைத்தும்","Bill":"பில்","Customer":"வாடிக்கையாளர்","Items":"பொருட்கள்","Paid by":"கட்டணம்","Amount":"தொகை","View":"பார்","Walk-in":"நேரடி வாடிக்கையாளர்","No bills found.":"பில்கள் இல்லை.","Receipt":"ரசீது","Items sold":"விற்ற பொருட்கள்","GST collected":"வசூலித்த GST","Cake advances":"கேக் முன்பணம்","Waste today":"இன்று வீணானது","By payment":"கட்டண முறைப்படி","Top sellers":"அதிகம் விற்றவை",
  "Bill saved":"பில் சேமிக்கப்பட்டது","New bill":"புதிய பில்","Copy text":"நகலெடு","Barcode":"பார்கோடு","Close":"மூடு","Point the camera at the barcode.":"கேமராவை பார்கோடு நோக்கிக் காட்டவும்.",
  "Wrong PIN. Try again.":"தவறான PIN. மீண்டும் முயற்சிக்கவும்.","Bake now":"இப்போது தயாரி","No sales yet today.":"இன்று இன்னும் விற்பனை இல்லை.","Nothing to bake":"தேவையில்லை",
 };
@@ -1105,14 +1150,14 @@ function receiptText(b){
   L.push('Thank you! Visit again.');
   return L.join('\n');
 }
-function showReceipt(b){
+function showReceipt(b, fromHistory){
   const rows = b.items.map(i => `<div class="row"><span>${esc(nm(i))} ×${i.qty}</span><span>${rupee(i.amount)}</span></div>`).join('');
   const gstRows = [...new Set(b.items.map(i => i.gst_rate))].filter(r => r > 0).map(r => {
     const tx = b.items.filter(i => i.gst_rate === r).reduce((a,i)=>a+i.tax,0);
     return `<div class="row muted"><span>CGST ${r/2}% + SGST ${r/2}%</span><span>${rupee2(tx)}</span></div>`;
   }).join('');
   const text = receiptText(b);
-  openModal(t('Bill saved'), `
+  openModal(fromHistory ? `${t('Receipt')} ${b.bill_no}` : t('Bill saved'), `
     <div class="receipt">
       <div class="c big">NOOR BAKERY</div>
       <div class="c muted">GSTIN 33ABCDE1234F1Z5 (demo)</div>
@@ -1127,7 +1172,7 @@ function showReceipt(b){
       <a class="btn wa" target="_blank" rel="noopener" href="${esc(waLink(b.phone, text))}">${esc(t('Send on WhatsApp'))}</a>
       <button class="btn" type="button" id="rcShare">${esc(IN_APP ? t('Share') : t('Copy text'))}</button>
     </div>
-    <button class="btn primary big" type="button" id="rcNew">${esc(t('New bill'))}</button>`);
+    <button class="btn primary big" type="button" id="rcNew">${esc(fromHistory ? t('Close') : t('New bill'))}</button>`);
   $('#rcShare').addEventListener('click', () => shareText(text));
   $('#rcNew').addEventListener('click', closeModal);
 }
@@ -1135,6 +1180,33 @@ function doCheckout(lines, info){
   const r = C.checkout(lines, { ...info, staff: ROLE });
   if (!r.ok){ toast(r.error === 'stock' ? `${r.name}: ${r.have} ${t('left')}` : t('Tap an item to add it to the bill.')); return null; }
   return r.bill;
+}
+
+/* ---------- bill history ---------- */
+let BILL_RANGE = 'today';
+function rangeDates(){
+  if (ROLE !== 'Owner') return [TODAY, TODAY];
+  if (BILL_RANGE === 'yesterday') return [dayOffset(-1), dayOffset(-1)];
+  if (BILL_RANGE === 'week') return [dayOffset(-6), TODAY];
+  if (BILL_RANGE === 'all') return ['0000-00-00', '9999-12-31'];
+  return [TODAY, TODAY];
+}
+function renderBills(){
+  const [from, to] = rangeDates();
+  const r = C.billList({ from, to, search: $('#billSearch').value });
+  $$('#billRange button').forEach(b => b.setAttribute('aria-pressed', b.dataset.range === BILL_RANGE ? 'true' : 'false'));
+  $('#billSummary').innerHTML = `<strong>${r.count}</strong> ${esc(LANG==='ta' ? t('Bills') : (r.count === 1 ? 'bill' : 'bills'))} · <strong>${rupee(r.amount)}</strong>${r.count > r.rows.length ? ` · ${LANG==='ta'?'சமீபத்திய':'showing latest'} ${r.rows.length}` : ''}`;
+  $('#billBody').innerHTML = r.rows.length ? r.rows.map(b => {
+    const names = b.items.map(i => `${nm(i)} ×${i.qty}`);
+    const itemsTxt = names.length > 2 ? `${names.slice(0,2).join(', ')} +${names.length-2}` : names.join(', ');
+    const payCls = b.payment === 'Cash' ? 'ok' : b.payment === 'UPI' ? 'info' : 'warn';
+    return `<tr class="billrow" data-bill="${b.id}"><td><div class="item-name">${esc(b.bill_no)}</div><div class="muted">${b.day===TODAY?t('Today'):niceDate(b.day)} · ${time12(b.time)} · ${esc(t(b.staff))}</div></td>
+      <td data-label="${esc(t('Customer'))}">${b.customer ? `${esc(b.customer)}${b.phone?`<div class="muted">${esc(b.phone)}</div>`:''}` : `<span class="muted">${esc(t('Walk-in'))}</span>`}</td>
+      <td data-label="${esc(t('Items'))}" style="max-width:260px">${esc(itemsTxt)}</td>
+      <td data-label="${esc(t('Paid by'))}">${pill(payCls, b.payment === 'Cash' ? t('Cash') : b.payment === 'Card' ? t('Card') : b.payment)}</td>
+      <td class="r num" data-label="${esc(t('Amount'))}"><strong>${rupee(b.amount)}</strong></td>
+      <td class="r"><button class="btn small" type="button" data-bill="${b.id}">${esc(t('View'))}</button></td></tr>`;
+  }).join('') : `<tr><td class="muted">${esc(t('No bills found.'))}</td></tr>`;
 }
 
 /* ---------- products ---------- */
@@ -1383,6 +1455,7 @@ const EXAMPLES = () => [
   ["Today's best sellers", `SELECT p.name, SUM(s.qty) AS sold, SUM(s.amount) AS revenue\nFROM sales s JOIN products p ON s.product_id = p.id\nWHERE s.day = '${TODAY}'\nGROUP BY p.name\nORDER BY revenue DESC;`],
   ['Sales by payment', `SELECT payment, COUNT(*) AS bills, SUM(amount) AS amount\nFROM bills\nWHERE day = '${TODAY}'\nGROUP BY payment;`],
   ['Busiest hours (7 days)', `SELECT SUBSTRING(time, 1, 2) AS hour, COUNT(*) AS bills, SUM(amount) AS amount\nFROM bills\nGROUP BY SUBSTRING(time, 1, 2)\nORDER BY hour;`],
+  ['Bills with items', `SELECT b.bill_no, b.time, b.customer, p.name, s.qty, s.amount\nFROM bills b\nJOIN sales s ON s.bill_id = b.id\nJOIN products p ON s.product_id = p.id\nWHERE b.day = '${TODAY}'\nORDER BY b.id DESC;`],
   ['Cake orders due', `SELECT customer, item, weight_kg, due_day, due_time,\n       amount - advance AS balance\nFROM cake_orders\nWHERE status <> 'delivered'\nORDER BY due_day, due_time;`],
   ['Cost to bake 1 batch', `SELECT p.name, SUM(r.qty * i.cost) AS ingredient_cost,\n       p.price * p.batch_yield AS sales_value\nFROM recipes r\nJOIN ingredients i ON r.ingredient_id = i.id\nJOIN products p ON r.product_id = p.id\nGROUP BY p.name, p.price, p.batch_yield;`],
   ['Counter by batch', `SELECT p.name, b.qty, b.made_on, b.best_before\nFROM batches b JOIN products p ON b.product_id = p.id\nORDER BY b.best_before;`],
@@ -1407,7 +1480,7 @@ function runConsole(){
 function renderAll(){
   saveDb();
   if (ROLE === 'Owner'){ renderFigures(); renderIngredients(); renderReports(); renderHistory(); }
-  renderAlerts(); renderTiles(); renderCart(); renderProducts(); renderBake(); renderCakes(); renderLog();
+  renderAlerts(); renderTiles(); renderCart(); renderBills(); renderProducts(); renderBake(); renderCakes(); renderLog();
   const lowN = C.q('SELECT COUNT(*) AS c FROM ingredients WHERE qty <= reorder_level')[0].c;
   const ingTab = document.querySelector('[data-tab="ingredients"]');
   ingTab.innerHTML = esc(t('Ingredients')) + (lowN ? `<span class="count">${lowN}</span>` : '');
@@ -1446,6 +1519,7 @@ document.addEventListener('click', e => {
   const dec = e.target.closest('[data-dec]'); if (dec){ const id = +dec.dataset.dec; const n = (cart.get(id)||0) - 1; n > 0 ? cart.set(id, n) : cart.delete(id); renderTiles(); renderCart(); return; }
   const s = e.target.closest('[data-sell]');
   if (s){ const id = +s.dataset.sell; const n = Math.max(1, Math.floor(+$('#sellQty'+id).value || 1)); const b = doCheckout([{pid:id, qty:n}], {payment:'Cash'}); if (b){ renderAll(); toast(`${b.bill_no}: ${n} × ${nm(b.items[0])} · ${rupee(b.amount)}`); } return; }
+  const bl = e.target.closest('[data-bill]'); if (bl){ const d = C.billDetail(+bl.dataset.bill); if (d) showReceipt(d, true); return; }
   const bc = e.target.closest('[data-barcode]'); if (bc){ showBarcode(+bc.dataset.barcode); return; }
   const g = e.target.closest('[data-goto]'); if (g){ showTab(g.dataset.goto); return; }
   const po = e.target.closest('[data-po]'); if (po){ const plan = PLANS[+po.dataset.po]; if (plan){ C.createPO(plan); setTimeout(() => { renderAll(); toast(`${t('Order sent')}: ${plan.supplier}`); }, 300); } return; }
@@ -1453,6 +1527,8 @@ document.addEventListener('click', e => {
   const ck = e.target.closest('[data-cake]'); if (ck){ C.setCakeStatus(+ck.dataset.cake, ck.dataset.st); renderAll(); toast(ck.dataset.st === 'ready' ? t('Ready') : t('Delivered')); return; }
   const pl = e.target.closest('[data-plan]'); if (pl){ $('#bakeItem').value = pl.dataset.plan; $('#bakeN').value = pl.dataset.batches; renderBake(); $('#bakeForm').scrollIntoView({behavior:'smooth', block:'center'}); return; }
 });
+$('#billRange').addEventListener('click', e => { const b = e.target.closest('[data-range]'); if (b){ BILL_RANGE = b.dataset.range; renderBills(); } });
+$('#billSearch').addEventListener('input', renderBills);
 $('#paySeg').addEventListener('click', e => { const b = e.target.closest('[data-pay]'); if (b){ PAY = b.dataset.pay; renderCart(); } });
 $('#clearCart').addEventListener('click', () => { cart.clear(); renderTiles(); renderCart(); });
 $('#checkoutBtn').addEventListener('click', () => {

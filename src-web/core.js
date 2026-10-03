@@ -276,6 +276,26 @@ function productByBarcode(code) {
   return q('SELECT * FROM products WHERE barcode = ?', [String(code).trim()])[0] || null;
 }
 
+function billList(f) {
+  const term = '%' + String(f.search || '').trim().toLowerCase() + '%';
+  const rows = q(`SELECT * FROM bills WHERE day >= ? AND day <= ?
+                  AND (LOWER(bill_no) LIKE ? OR LOWER(customer) LIKE ? OR phone LIKE ?)
+                  ORDER BY id DESC LIMIT 300`, [f.from, f.to, term, term, term]);
+  const sum = q(`SELECT COUNT(*) AS n, SUM(amount) AS amt FROM bills WHERE day >= ? AND day <= ?
+                 AND (LOWER(bill_no) LIKE ? OR LOWER(customer) LIKE ? OR phone LIKE ?)`, [f.from, f.to, term, term, term])[0];
+  rows.forEach(b => {
+    b.items = q(`SELECT p.name, p.name_ta, s.qty FROM sales s JOIN products p ON s.product_id = p.id WHERE s.bill_id = ? ORDER BY s.id`, [b.id]);
+  });
+  return { rows, count: sum.n || 0, amount: sum.amt || 0 };
+}
+function billDetail(id) {
+  const b = q('SELECT * FROM bills WHERE id = ?', [id])[0];
+  if (!b) return null;
+  b.items = q(`SELECT p.id AS pid, p.name, p.name_ta, p.price, p.gst_rate, s.qty, s.amount FROM sales s JOIN products p ON s.product_id = p.id
+               WHERE s.bill_id = ? ORDER BY s.id`, [id]).map(i => ({ ...i, tax: i.amount * i.gst_rate / (100 + i.gst_rate) }));
+  return b;
+}
+
 /* ---------------- purchase orders ---------------- */
 function suggestQty(i) {
   let need = i.reorder_level * 2 - i.qty;
@@ -391,7 +411,7 @@ root.Core = {
   get db() { return db; }, set onLog(f) { onLog = f; },
   q, w, seed, dump, restore,
   receive, addIngredient, recipeNeeds, bake, freshStock, writeOff,
-  checkout, productByBarcode,
+  checkout, productByBarcode, billList, billDetail,
   reorderPlan, createPO, receivePO, pendingPOs, sentToday,
   addCakeOrder, setCakeStatus, cakeOrders, deliveredCakes,
   closing, weekly, profit, wasteReport, bakeTomorrow,

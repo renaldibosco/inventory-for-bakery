@@ -15,6 +15,7 @@ A demo inventory system for a bakery, built on a SQL database (AlaSQL, running o
 - **Daily closing report**, **7-day sales chart**, **profit per item**, **waste tracking**
 - **Plan for tomorrow**: what to bake from last week's sales
 - **Cake orders** with delivery date, advance and balance
+- **Bill history**: search past bills by number, customer or phone; reopen and resend receipts
 - **Owner / Staff login** (demo PINs 1234 / 0000) and **Tamil** language
 
 ## Layout
