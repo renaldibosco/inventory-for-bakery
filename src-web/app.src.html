@@ -242,6 +242,10 @@ footer{font-size:.8rem;color:var(--muted)}
   table.cards td.sell-cell .btn{padding:9px 22px;font-size:.95rem}
   .sqlbox .log{max-height:300px}
   .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tabs{flex-wrap:wrap;overflow:visible;gap:6px;border-bottom:0;position:static;padding-bottom:4px}
+  .tab{border:1px solid var(--line);border-radius:99px;padding:7px 12px;margin:0;font-size:.86rem;background:var(--surface)}
+  .tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+  .tab[aria-selected="true"] .count{background:var(--accent-ink);color:var(--accent)}
 }
 @media (prefers-reduced-motion:reduce){.log pre.fresh{animation:none}.tile:active:not(:disabled){transform:none}}
 </style>
