@@ -9,5 +9,6 @@ app_libs='''<script src="alasql.min.js"></script>
 <script src="JsBarcode.all.min.js"></script>'''
 base=src.replace('/*CORE*/',core)
 open('noor-web.html','w').write(base.replace('<!--LIBS-->',web_libs))
-open('noor-app.html','w').write(base.replace('<!--LIBS-->',app_libs))
+head='<!doctype html>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
+open('noor-app.html','w').write(head + base.replace('<!--LIBS-->',app_libs))
 print('built', len(base))
