@@ -1,0 +1,702 @@
+<title>Noor Bakery Stock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: shop header, four figures, alerts strip, tabbed work area, SQL log that shows each query as it runs */
+:root{
+  --bg:#F1F0EC; --surface:#FFFFFF; --sunk:#E9E6E0; --ink:#251D18; --muted:#6C635C; --line:#DCD7CF;
+  --accent:#7A2C50; --accent-ink:#FFFFFF; --accent-soft:#F3E4EB; --butter:#E7B23C;
+  --ok:#2C7349; --ok-soft:#E1F0E6; --warn:#9A6411; --warn-soft:#FBEFD6; --bad:#A8261D; --bad-soft:#F8E1DE;
+  --code-bg:#221B17; --code-ink:#F1E7DD; --code-kw:#E7B23C; --code-str:#9ED3A8;
+  --display:"Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#191513; --surface:#231E1B; --sunk:#2C2622; --ink:#F2ECE6; --muted:#A99F97; --line:#3A332E;
+  --accent:#E28FB4; --accent-ink:#2A1019; --accent-soft:#3A2330; --butter:#E7B23C;
+  --ok:#7CCB97; --ok-soft:#1F3328; --warn:#E8B45A; --warn-soft:#3A2D16; --bad:#F08A80; --bad-soft:#3D201D;
+  --code-bg:#120F0D; --code-ink:#EDE3D9; --code-kw:#E7B23C; --code-str:#9ED3A8; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#191513; --surface:#231E1B; --sunk:#2C2622; --ink:#F2ECE6; --muted:#A99F97; --line:#3A332E;
+  --accent:#E28FB4; --accent-ink:#2A1019; --accent-soft:#3A2330; --butter:#E7B23C;
+  --ok:#7CCB97; --ok-soft:#1F3328; --warn:#E8B45A; --warn-soft:#3A2D16; --bad:#F08A80; --bad-soft:#3D201D;
+  --code-bg:#120F0D; --code-ink:#EDE3D9; --code-kw:#E7B23C; --code-str:#9ED3A8; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;padding:20px 16px 48px}
+.wrap{max-width:1120px;margin:0 auto;display:grid;gap:20px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(1.6rem,4vw,2.2rem);line-height:1.1}
+h2{font-size:1.25rem}
+h3{font-size:1rem}
+.num{font-variant-numeric:tabular-nums}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+header.top{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-end;justify-content:space-between}
+.brand{display:grid;gap:4px}
+.eyebrow{font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:600}
+.brand p{margin:0;color:var(--muted)}
+.demo-tag{display:inline-block;background:var(--butter);color:#2A1F0A;font-family:var(--mono);font-size:.7rem;padding:2px 8px;border-radius:99px;vertical-align:middle;margin-left:8px;letter-spacing:.04em}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.today{font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+
+.btn{border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:600;font-size:.9rem;white-space:nowrap}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.small{padding:5px 10px;font-size:.82rem}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.figures{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.fig{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;gap:2px;align-content:start}
+.fig .label{font-size:.78rem;color:var(--muted);font-weight:500}
+.fig .value{font-family:var(--display);font-size:1.7rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.15}
+.fig .sub{font-size:.8rem;color:var(--muted)}
+.fig.alert .value{color:var(--bad)}
+.fig.warn .value{color:var(--warn)}
+@media (max-width:760px){.figures{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.alerts{display:grid;gap:6px}
+.alert-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:8px;padding:8px 12px;font-size:.9rem}
+.alert-row.bad{border-left-color:var(--bad)}
+.alert-row .what{flex:1;min-width:0}
+
+.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);scrollbar-width:none}
+.tab{border:0;background:none;padding:10px 14px;cursor:pointer;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tab .count{font-family:var(--mono);font-size:.72rem;background:var(--bad-soft);color:var(--bad);border-radius:99px;padding:1px 6px;margin-left:4px}
+
+.work{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
+@media (max-width:980px){.work{grid-template-columns:minmax(0,1fr)}}
+.panel{display:grid;gap:14px;min-width:0}
+.panel-head{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center}
+.panel-head p{margin:2px 0 0;color:var(--muted);font-size:.88rem}
+
+.table-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;background:var(--sunk);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.r,th.r{text-align:right}
+td .muted{color:var(--muted);font-size:.8rem}
+.item-name{font-weight:600}
+
+.pill{display:inline-block;font-size:.74rem;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap;margin:1px 2px 1px 0}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+
+.bar{height:6px;background:var(--sunk);border-radius:99px;overflow:hidden;min-width:70px}
+.bar span{display:block;height:100%;background:var(--ok);border-radius:99px}
+.bar.low span{background:var(--bad)}
+
+.sell{display:flex;gap:6px;align-items:center;justify-content:flex-end}
+.sell input{width:56px;padding:5px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);text-align:center}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:12px}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;align-items:end}
+.field{display:grid;gap:4px;min-width:0}
+.field label{font-size:.78rem;color:var(--muted);font-weight:600}
+.field input,.field select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);width:100%}
+
+.need-list{display:grid;gap:6px}
+.need{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:center;font-size:.9rem;padding:6px 0;border-bottom:1px dashed var(--line)}
+.need:last-child{border-bottom:0}
+.need .have{color:var(--muted);font-size:.8rem}
+
+.sales-bars{display:grid;gap:8px}
+.sb{display:grid;grid-template-columns:140px minmax(0,1fr) 80px;gap:10px;align-items:center;font-size:.88rem}
+.sb .track{height:14px;background:var(--sunk);border-radius:4px;overflow:hidden}
+.sb .track span{display:block;height:100%;background:var(--accent);border-radius:4px}
+@media (max-width:480px){.sb{grid-template-columns:100px minmax(0,1fr) 64px}}
+
+/* SQL side */
+.sqlbox{background:var(--code-bg);color:var(--code-ink);border-radius:var(--r);padding:14px;display:grid;gap:10px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
+@media (max-width:980px){.sqlbox{position:static}}
+.sqlbox h3{color:var(--code-ink);font-size:.95rem;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sqlbox .hint{font-size:.78rem;opacity:.7;margin:0}
+.log{display:grid;gap:8px;max-height:460px;overflow:auto}
+.log pre{margin:0;font-family:var(--mono);font-size:.76rem;line-height:1.5;white-space:pre-wrap;word-break:break-word;padding:8px 10px;background:rgba(255,255,255,.05);border-radius:6px;border-left:3px solid var(--code-kw)}
+.log pre.fresh{animation:flash 1.2s ease-out}
+@keyframes flash{from{background:rgba(231,178,60,.25)}to{background:rgba(255,255,255,.05)}}
+.kw{color:var(--code-kw);font-weight:500}
+.str{color:var(--code-str)}
+.empty-log{font-size:.8rem;opacity:.65;margin:0}
+
+.console textarea{width:100%;min-height:130px;font-family:var(--mono);font-size:.85rem;padding:12px;border-radius:8px;border:1px solid var(--line);background:var(--code-bg);color:var(--code-ink);resize:vertical}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:4px 12px;font-size:.82rem;cursor:pointer}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.err{color:var(--bad);font-family:var(--mono);font-size:.85rem;margin:0}
+.schema pre{margin:0;font-family:var(--mono);font-size:.78rem;white-space:pre;overflow-x:auto;background:var(--code-bg);color:var(--code-ink);padding:12px;border-radius:8px}
+details summary{cursor:pointer;font-weight:600;font-size:.88rem}
+.muted{color:var(--muted)}
+
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-weight:600;font-size:.9rem;box-shadow:0 6px 24px rgba(0,0,0,.2);max-width:calc(100% - 32px);z-index:10}
+footer{font-size:.8rem;color:var(--muted)}
+/* Phone: tables become cards */
+@media (max-width:640px){
+  .table-wrap:has(table.cards){background:none;border:0;overflow:visible}
+  table.cards thead{display:none}
+  table.cards,table.cards tbody{display:block}
+  table.cards tr{display:grid;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:10px}
+  table.cards td{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:3px 0;border:0;text-align:right}
+  table.cards td:first-child{display:block;text-align:left;padding-bottom:6px;border-bottom:1px dashed var(--line);margin-bottom:4px}
+  table.cards td[data-label]::before{content:attr(data-label);font-size:.74rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;text-align:left;flex-shrink:0}
+  table.cards td > div{min-width:0}
+  table.cards .bar{flex:1;max-width:60%}
+  table.cards td.sell-cell{padding-top:8px}
+  table.cards td.sell-cell .sell{width:100%}
+  table.cards td.sell-cell .sell input{flex:1;padding:9px;font-size:1rem}
+  table.cards td.sell-cell .btn{padding:9px 22px;font-size:.95rem}
+  .sqlbox .log{max-height:300px}
+}
+@media (prefers-reduced-motion:reduce){.log pre.fresh{animation:none}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <span class="eyebrow">Inventory system</span>
+      <h1>Noor Bakery <span class="demo-tag">DEMO</span></h1>
+      <p>Ingredients, baked goods, sales and expiry, all stored in a SQL database.</p>
+    </div>
+    <div class="top-actions">
+      <span class="today" id="todayLabel"></span>
+      <button class="btn" id="resetBtn" type="button">Reset demo data</button>
+    </div>
+  </header>
+
+  <section class="figures" aria-label="Today at a glance">
+    <div class="fig"><span class="label">Today's sales</span><span class="value" id="fSales">₹0</span><span class="sub" id="fSalesSub"></span></div>
+    <div class="fig"><span class="label">Ingredient stock value</span><span class="value" id="fValue">₹0</span><span class="sub">at purchase cost</span></div>
+    <div class="fig alert" id="fLowBox"><span class="label">Need reordering</span><span class="value" id="fLow">0</span><span class="sub">ingredients at or below reorder level</span></div>
+    <div class="fig warn" id="fExpBox"><span class="label">Expiring / expired</span><span class="value" id="fExp">0</span><span class="sub">within the next 3 days</span></div>
+  </section>
+
+  <section class="alerts" id="alerts" aria-label="Alerts"></section>
+
+  <nav class="tabs" role="tablist" id="tabs">
+    <button class="tab" role="tab" data-tab="ingredients" aria-selected="true">Ingredients</button>
+    <button class="tab" role="tab" data-tab="products" aria-selected="false">Bakery items</button>
+    <button class="tab" role="tab" data-tab="bake" aria-selected="false">Bake a batch</button>
+    <button class="tab" role="tab" data-tab="sales" aria-selected="false">Sales</button>
+    <button class="tab" role="tab" data-tab="history" aria-selected="false">Stock history</button>
+    <button class="tab" role="tab" data-tab="sql" aria-selected="false">SQL console</button>
+  </nav>
+
+  <div class="work">
+    <main>
+      <!-- Ingredients -->
+      <section class="panel" data-panel="ingredients">
+        <div class="panel-head">
+          <div><h2>Ingredients</h2><p>Raw materials in the store room. Red bars are at or below their reorder level.</p></div>
+        </div>
+        <div class="table-wrap"><table class="cards">
+          <thead><tr><th>Ingredient</th><th class="r">In stock</th><th>Level</th><th class="r">Reorder at</th><th>Expiry</th><th>Status</th></tr></thead>
+          <tbody id="ingBody"></tbody>
+        </table></div>
+        <div class="card">
+          <h3>Receive stock from supplier</h3>
+          <form class="form" id="receiveForm">
+            <div class="field"><label for="rcvItem">Ingredient</label><select id="rcvItem"></select></div>
+            <div class="field"><label for="rcvQty">Quantity</label><input id="rcvQty" type="number" min="0.01" step="0.01" value="10" required></div>
+            <div class="field"><label for="rcvExp">New expiry date</label><input id="rcvExp" type="date" required></div>
+            <button class="btn primary" type="submit">Add to stock</button>
+          </form>
+        </div>
+        <details class="card">
+          <summary>Add a new ingredient</summary>
+          <form class="form" id="newIngForm">
+            <div class="field"><label for="niName">Name</label><input id="niName" required placeholder="e.g. Cashew nuts"></div>
+            <div class="field"><label for="niUnit">Unit</label><select id="niUnit"><option>kg</option><option>L</option><option>pcs</option><option>g</option></select></div>
+            <div class="field"><label for="niQty">Opening stock</label><input id="niQty" type="number" min="0" step="0.01" value="5" required></div>
+            <div class="field"><label for="niReorder">Reorder at</label><input id="niReorder" type="number" min="0" step="0.01" value="2" required></div>
+            <div class="field"><label for="niCost">Cost per unit (₹)</label><input id="niCost" type="number" min="0" step="0.5" value="900" required></div>
+            <div class="field"><label for="niExp">Expiry</label><input id="niExp" type="date" required></div>
+            <button class="btn primary" type="submit">Add ingredient</button>
+          </form>
+        </details>
+      </section>
+
+      <!-- Products -->
+      <section class="panel" data-panel="products" hidden>
+        <div class="panel-head">
+          <div><h2>Bakery items</h2><p>Finished goods on the counter. Sales take from the oldest batch first (FIFO).</p></div>
+          <button class="btn danger small" id="writeOffBtn" type="button">Remove expired stock</button>
+        </div>
+        <div class="table-wrap"><table class="cards">
+          <thead><tr><th>Item</th><th class="r">Price</th><th class="r">On counter</th><th>Batches (best before)</th><th>Status</th><th class="r">Sell</th></tr></thead>
+          <tbody id="prodBody"></tbody>
+        </table></div>
+      </section>
+
+      <!-- Bake -->
+      <section class="panel" data-panel="bake" hidden>
+        <div class="panel-head">
+          <div><h2>Bake a batch</h2><p>Baking uses the recipe to take ingredients out of stock and adds the finished items to the counter.</p></div>
+        </div>
+        <div class="card">
+          <form class="form" id="bakeForm">
+            <div class="field"><label for="bakeItem">What are you baking?</label><select id="bakeItem"></select></div>
+            <div class="field"><label for="bakeN">Number of batches</label><input id="bakeN" type="number" min="1" max="20" step="1" value="1" required></div>
+            <button class="btn primary" type="submit" id="bakeBtn">Bake</button>
+          </form>
+          <p class="muted" id="bakeYield" style="margin:0"></p>
+          <div class="need-list" id="needList"></div>
+        </div>
+      </section>
+
+      <!-- Sales -->
+      <section class="panel" data-panel="sales" hidden>
+        <div class="panel-head">
+          <div><h2>Today's sales</h2><p id="salesSummary"></p></div>
+        </div>
+        <div class="card"><h3>Revenue by item</h3><div class="sales-bars" id="salesBars"></div></div>
+        <div class="table-wrap"><table class="cards">
+          <thead><tr><th>Time</th><th>Item</th><th class="r">Qty</th><th class="r">Amount</th></tr></thead>
+          <tbody id="salesBody"></tbody>
+        </table></div>
+      </section>
+
+      <!-- History -->
+      <section class="panel" data-panel="history" hidden>
+        <div class="panel-head">
+          <div><h2>Stock history</h2><p>Every change to stock is written to a movements table, so nothing goes missing without a record.</p></div>
+        </div>
+        <div class="table-wrap"><table class="cards">
+          <thead><tr><th>When</th><th>Item</th><th>Type</th><th class="r">Change</th><th>Note</th></tr></thead>
+          <tbody id="histBody"></tbody>
+        </table></div>
+      </section>
+
+      <!-- SQL console -->
+      <section class="panel console" data-panel="sql" hidden>
+        <div class="panel-head">
+          <div><h2>SQL console</h2><p>Ask the database anything. Pick an example or write your own query.</p></div>
+        </div>
+        <div class="chips" id="chips"></div>
+        <label for="sqlInput" class="muted" style="font-size:.8rem">Query</label>
+        <textarea id="sqlInput" spellcheck="false"></textarea>
+        <div><button class="btn primary" id="runSql" type="button">Run query</button></div>
+        <p class="err" id="sqlErr" hidden></p>
+        <div class="table-wrap" id="sqlResult"></div>
+        <details class="card schema">
+          <summary>Database tables (schema)</summary>
+          <pre id="schemaText"></pre>
+        </details>
+      </section>
+    </main>
+
+    <aside class="sqlbox" aria-label="SQL log">
+      <h3>SQL that just ran <button class="btn small" id="clearLog" type="button" style="background:transparent;color:inherit;border-color:rgba(255,255,255,.2)">Clear</button></h3>
+      <p class="hint">Sell, bake or receive something. The real SQL statements the app sends to the database show up here.</p>
+      <div class="log" id="log"><p class="empty-log">Nothing yet. Try selling a Veg puff.</p></div>
+    </aside>
+  </div>
+
+  <footer id="footNote">Demo data only. Prices in ₹. In this demo the database lives in your browser and resets when you reload; the real system would use a shared MySQL or PostgreSQL server.</footer>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/alasql@4.19.1/dist/alasql.min.js"></script>
+<script>
+(function(){
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = n => String(n).padStart(2,'0');
+const isoDay = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const dayOffset = n => { const d = new Date(); d.setDate(d.getDate()+n); return isoDay(d); };
+const TODAY = dayOffset(0);
+const nowTime = () => { const d = new Date(); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+const rupee = v => '₹' + Math.round(v).toLocaleString('en-IN');
+const qtyFmt = (v, unit) => { const n = Math.round(v*1000)/1000; return (unit==='pcs' ? Math.round(n) : n.toLocaleString('en-IN',{maximumFractionDigits:2})) + ' ' + unit; };
+const daysUntil = iso => Math.round((new Date(iso+'T00:00:00') - new Date(TODAY+'T00:00:00'))/86400000);
+const niceDate = iso => new Date(iso+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+const r3 = v => Math.round(v*1000)/1000;
+
+let db; const LOG = []; let freshCount = 0;
+const IN_APP = location.protocol === 'file:';   // Android app: keep data on the phone
+const STORE_KEY = 'noor-bakery-db-v1';
+const TABLES = ['ingredients','products','recipes','batches','sales','movements'];
+function saveDb(){
+  if (!IN_APP) return;
+  try{ const data = {}; TABLES.forEach(t => data[t] = db.exec(`SELECT * FROM ${t}`)); localStorage.setItem(STORE_KEY, JSON.stringify(data)); }catch(e){}
+}
+function loadDb(){
+  if (!IN_APP) return false;
+  try{
+    const raw = localStorage.getItem(STORE_KEY); if (!raw) return false;
+    const data = JSON.parse(raw);
+    db = new alasql.Database();
+    SCHEMA.split(';').map(s=>s.trim()).filter(Boolean).forEach(s => db.exec(s));
+    TABLES.forEach(t => { if (data[t] && data[t].length) db.exec(`INSERT INTO ${t} SELECT * FROM ?`, [data[t]]); });
+    return true;
+  }catch(e){ return false; }
+}
+
+function fmtSql(sql, params){
+  let i = 0;
+  return sql.trim().replace(/\s+/g,' ').replace(/\?/g, () => {
+    const v = params[i++]; return typeof v === 'string' ? `'${v.replace(/'/g,"''")}'` : String(v);
+  });
+}
+function q(sql, params = [], log = false){
+  if (log){ LOG.unshift(fmtSql(sql, params)); freshCount++; if (LOG.length > 40) LOG.length = 40; }
+  return db.exec(sql, params);
+}
+const w = (sql, params) => q(sql, params, true);  // write + log
+function nextId(t){ const r = q(`SELECT MAX(id) AS m FROM ${t}`); return (r[0] && r[0].m ? r[0].m : 0) + 1; }
+
+const SCHEMA = `CREATE TABLE ingredients (
+  id INT, name TEXT, unit TEXT, qty REAL,
+  reorder_level REAL, cost REAL, expiry TEXT, supplier TEXT);
+
+CREATE TABLE products (
+  id INT, name TEXT, category TEXT, price REAL,
+  shelf_days INT, batch_yield INT, reorder_level INT);
+
+CREATE TABLE recipes (
+  product_id INT, ingredient_id INT, qty REAL);
+
+CREATE TABLE batches (
+  id INT, product_id INT, qty INT, made_on TEXT, best_before TEXT);
+
+CREATE TABLE sales (
+  id INT, day TEXT, time TEXT, product_id INT, qty INT, amount REAL);
+
+CREATE TABLE movements (
+  id INT, day TEXT, time TEXT, item TEXT, kind TEXT,
+  delta REAL, unit TEXT, note TEXT);`;
+
+function seed(){
+  db = new alasql.Database();
+  SCHEMA.split(';').map(s=>s.trim()).filter(Boolean).forEach(s => q(s));
+  const ing = [
+    [1,'Maida (all-purpose flour)','kg',42,20,38,dayOffset(60),'Sri Lakshmi Traders'],
+    [2,'Sugar','kg',18,10,44,dayOffset(180),'Sri Lakshmi Traders'],
+    [3,'Butter','kg',2.5,5,520,dayOffset(12),'Aavin Dairy'],
+    [4,'Eggs','pcs',90,60,6.5,dayOffset(6),'Kumar Poultry'],
+    [5,'Milk','L',6,8,56,dayOffset(2),'Aavin Dairy'],
+    [6,'Instant yeast','kg',0.8,0.5,420,dayOffset(90),'Bake Supply Co.'],
+    [7,'Cocoa powder','kg',1.2,1,650,dayOffset(120),'Bake Supply Co.'],
+    [8,'Fresh cream','L',3,2,240,dayOffset(3),'Aavin Dairy'],
+    [9,'Salt','kg',5,1,28,dayOffset(365),'Sri Lakshmi Traders'],
+    [10,'Cooking oil','L',10,5,150,dayOffset(150),'Sri Lakshmi Traders'],
+  ];
+  ing.forEach(r => q('INSERT INTO ingredients VALUES (?,?,?,?,?,?,?,?)', r));
+  const prods = [
+    [1,'Sandwich bread 400 g','Bread',45,3,12,10],
+    [2,'Butter bun','Bread',15,2,24,20],
+    [3,'Veg puff','Snacks',20,1,30,15],
+    [4,'Chocolate pastry','Cakes',60,2,16,8],
+    [5,'Plum cake 500 g','Cakes',180,10,8,4],
+    [6,'Coconut biscuits 250 g','Biscuits',70,20,20,10],
+  ];
+  prods.forEach(r => q('INSERT INTO products VALUES (?,?,?,?,?,?,?)', r));
+  const rec = {
+    1:[[1,6],[2,0.3],[6,0.1],[9,0.1],[10,0.3],[5,1]],
+    2:[[1,3],[2,0.6],[3,0.4],[6,0.06],[5,1.2],[4,4]],
+    3:[[1,2.5],[3,1.2],[9,0.05],[10,0.3]],
+    4:[[1,1],[2,1],[4,12],[7,0.3],[8,1.5],[10,0.4]],
+    5:[[1,1.6],[2,1.2],[3,1],[4,16]],
+    6:[[1,2],[2,1.2],[3,1],[9,0.02]],
+  };
+  Object.entries(rec).forEach(([p,list]) => list.forEach(([i,qt]) => q('INSERT INTO recipes VALUES (?,?,?)',[+p,i,qt])));
+  const batches = [
+    [1,1,4,dayOffset(-2),dayOffset(1)],
+    [2,1,10,TODAY,dayOffset(3)],
+    [3,2,4,dayOffset(-3),dayOffset(-1)],
+    [4,2,26,TODAY,dayOffset(2)],
+    [5,3,8,dayOffset(-1),TODAY],
+    [6,4,10,TODAY,dayOffset(2)],
+    [7,5,6,dayOffset(-2),dayOffset(8)],
+    [8,6,22,dayOffset(-5),dayOffset(15)],
+  ];
+  batches.forEach(r => q('INSERT INTO batches VALUES (?,?,?,?,?)', r));
+  const sales = [[1,'08:12',1,6,270],[2,'08:40',2,12,180],[3,'09:05',3,7,140],[4,'10:22',4,4,240],[5,'11:47',6,3,210]];
+  sales.forEach(([id,t,p,n,a]) => q('INSERT INTO sales VALUES (?,?,?,?,?,?)',[id,TODAY,t,p,n,a]));
+  const mv = [
+    [1,dayOffset(-1),'17:30','Maida (all-purpose flour)','in',50,'kg','Received from Sri Lakshmi Traders'],
+    [2,TODAY,'05:10','Sandwich bread 400 g','bake',10,'pcs','Baked fresh batch'],
+    [3,TODAY,'05:40','Butter bun','bake',26,'pcs','Baked fresh batch'],
+    [4,TODAY,'06:15','Chocolate pastry','bake',10,'pcs','Baked fresh batch'],
+  ];
+  mv.forEach(r => q('INSERT INTO movements VALUES (?,?,?,?,?,?,?,?)', r));
+  [[5,'08:12',1,6],[6,'08:40',2,12],[7,'09:05',3,7],[8,'10:22',4,4],[9,'11:47',6,3]].forEach(([id,t,p,n]) => {
+    const name = q('SELECT name FROM products WHERE id = ?',[p])[0].name;
+    q('INSERT INTO movements VALUES (?,?,?,?,?,?,?,?)',[id,TODAY,t,name,'sale',-n,'pcs','Counter sale']);
+  });
+}
+
+function move(item, kind, delta, unit, note){
+  w('INSERT INTO movements VALUES (?,?,?,?,?,?,?,?)',[nextId('movements'),TODAY,nowTime(),item,kind,r3(delta),unit,note]);
+}
+
+/* ---------- actions ---------- */
+function receive(id, qty, expiry){
+  const ing = q('SELECT * FROM ingredients WHERE id = ?',[id])[0];
+  w('UPDATE ingredients SET qty = ROUND(qty + ?, 3), expiry = ? WHERE id = ?',[qty, expiry, id]);
+  move(ing.name,'in',qty,ing.unit,'Received from '+ing.supplier);
+  toast(`Added ${qtyFmt(qty, ing.unit)} of ${ing.name}`);
+}
+function addIngredient(d){
+  const id = nextId('ingredients');
+  w('INSERT INTO ingredients VALUES (?,?,?,?,?,?,?,?)',[id,d.name,d.unit,d.qty,d.reorder,d.cost,d.expiry,'New supplier']);
+  move(d.name,'in',d.qty,d.unit,'Opening stock');
+  toast(`${d.name} added to ingredients`);
+}
+function recipeNeeds(pid, n){
+  return q(`SELECT r.ingredient_id, i.name, i.unit, r.qty * ? AS need, i.qty AS have
+            FROM recipes r JOIN ingredients i ON r.ingredient_id = i.id
+            WHERE r.product_id = ?`,[n,pid]);
+}
+function bake(pid, n){
+  const p = q('SELECT * FROM products WHERE id = ?',[pid])[0];
+  const needs = recipeNeeds(pid, n);
+  const short = needs.filter(x => x.need > x.have + 1e-9);
+  if (short.length){ toast(`Not enough ${short.map(s=>s.name).join(', ')}`); return; }
+  q(`SELECT r.ingredient_id, i.name, r.qty * ? AS need, i.qty AS have FROM recipes r JOIN ingredients i ON r.ingredient_id = i.id WHERE r.product_id = ?`,[n,pid], true);
+  needs.forEach(x => {
+    w('UPDATE ingredients SET qty = ROUND(qty - ?, 3) WHERE id = ?',[r3(x.need), x.ingredient_id]);
+  });
+  const made = p.batch_yield * n;
+  w('INSERT INTO batches VALUES (?,?,?,?,?)',[nextId('batches'),pid,made,TODAY,dayOffset(p.shelf_days)]);
+  move(p.name,'bake',made,'pcs',`Baked ${n} batch${n>1?'es':''}, used ${needs.length} ingredients`);
+  toast(`Baked ${made} × ${p.name}`);
+}
+function sell(pid, n){
+  const p = q('SELECT * FROM products WHERE id = ?',[pid])[0];
+  const avail = q('SELECT SUM(qty) AS s FROM batches WHERE product_id = ? AND best_before >= ?',[pid,TODAY])[0].s || 0;
+  if (n > avail){ toast(avail ? `Only ${avail} fresh ${p.name} left` : `No fresh ${p.name} left. Bake a batch first.`); return; }
+  const list = q('SELECT * FROM batches WHERE product_id = ? AND best_before >= ? AND qty > 0 ORDER BY best_before, made_on',[pid,TODAY], true);
+  let left = n;
+  for (const b of list){
+    if (!left) break;
+    const take = Math.min(left, b.qty);
+    if (take === b.qty) w('DELETE FROM batches WHERE id = ?',[b.id]);
+    else w('UPDATE batches SET qty = qty - ? WHERE id = ?',[take,b.id]);
+    left -= take;
+  }
+  const amt = n * p.price;
+  w('INSERT INTO sales VALUES (?,?,?,?,?,?)',[nextId('sales'),TODAY,nowTime(),pid,n,amt]);
+  move(p.name,'sale',-n,'pcs','Counter sale');
+  toast(`Sold ${n} × ${p.name} · ${rupee(amt)}`);
+}
+function writeOff(){
+  const exp = q(`SELECT b.id, b.qty, p.name, p.price FROM batches b JOIN products p ON b.product_id = p.id WHERE b.best_before < ?`,[TODAY], true);
+  if (!exp.length){ toast('No expired stock on the counter'); return; }
+  w('DELETE FROM batches WHERE best_before < ?',[TODAY]);
+  let loss = 0;
+  exp.forEach(e => { loss += e.qty*e.price; move(e.name,'waste',-e.qty,'pcs','Expired, removed from counter'); });
+  toast(`Removed ${exp.reduce((a,e)=>a+e.qty,0)} expired items (${rupee(loss)} at sale price)`);
+}
+
+/* ---------- rendering ---------- */
+function pill(cls, text){ return `<span class="pill ${cls}">${esc(text)}</span>`; }
+function expiryInfo(iso){
+  const d = daysUntil(iso);
+  if (d < 0) return {cls:'bad', text:`Expired ${-d}d ago`};
+  if (d === 0) return {cls:'bad', text:'Expires today'};
+  if (d <= 3) return {cls:'warn', text:`${d} day${d>1?'s':''} left`};
+  return null;
+}
+
+function renderFigures(){
+  const s = q('SELECT SUM(amount) AS a, SUM(qty) AS n, COUNT(*) AS c FROM sales WHERE day = ?',[TODAY])[0];
+  $('#fSales').textContent = rupee(s.a || 0);
+  $('#fSalesSub').textContent = `${s.n || 0} items in ${s.c || 0} bills`;
+  $('#fValue').textContent = rupee(q('SELECT SUM(qty * cost) AS v FROM ingredients')[0].v || 0);
+  const low = q('SELECT COUNT(*) AS c FROM ingredients WHERE qty <= reorder_level')[0].c;
+  $('#fLow').textContent = low;
+  const lim = dayOffset(3);
+  const e1 = q('SELECT COUNT(*) AS c FROM ingredients WHERE expiry <= ?',[lim])[0].c;
+  const e2 = q('SELECT COUNT(*) AS c FROM batches WHERE best_before <= ?',[TODAY])[0].c;
+  $('#fExp').textContent = e1 + e2;
+  $('#fExp').nextElementSibling.textContent = `${e1} ingredients within 3 days, ${e2} counter batches due today or past`;
+}
+
+function renderAlerts(){
+  const out = [];
+  q('SELECT name, qty, unit, reorder_level, supplier FROM ingredients WHERE qty <= reorder_level ORDER BY name').forEach(r => {
+    out.push(`<div class="alert-row bad"><span class="what"><strong>Reorder ${esc(r.name)}</strong>: ${qtyFmt(r.qty,r.unit)} left, reorder level is ${qtyFmt(r.reorder_level,r.unit)}. Supplier: ${esc(r.supplier)}</span><button class="btn small" data-receive="${esc(r.name)}">Receive stock</button></div>`);
+  });
+  const exp = q(`SELECT p.name, SUM(b.qty) AS n FROM batches b JOIN products p ON b.product_id = p.id WHERE b.best_before < ? GROUP BY p.name`,[TODAY]);
+  exp.forEach(r => out.push(`<div class="alert-row bad"><span class="what"><strong>${r.n} × ${esc(r.name)}</strong> are past best-before and should come off the counter.</span><button class="btn small" data-goto="products">Review</button></div>`));
+  q(`SELECT p.name, SUM(b.qty) AS n FROM batches b JOIN products p ON b.product_id = p.id WHERE b.best_before = ? GROUP BY p.name`,[TODAY]).forEach(r =>
+    out.push(`<div class="alert-row"><span class="what"><strong>Sell today:</strong> ${r.n} × ${esc(r.name)} reach best-before tonight.</span></div>`));
+  $('#alerts').innerHTML = out.join('');
+}
+
+function renderIngredients(){
+  const rows = q('SELECT * FROM ingredients ORDER BY name');
+  $('#ingBody').innerHTML = rows.map(r => {
+    const low = r.qty <= r.reorder_level;
+    const pct = Math.max(4, Math.min(100, r.qty / (r.reorder_level*2.5) * 100));
+    const ex = expiryInfo(r.expiry);
+    const status = [low ? pill('bad','Reorder') : '', ex ? pill(ex.cls, ex.cls==='bad' && daysUntil(r.expiry)<0 ? 'Expired' : 'Use soon') : '', (!low && !ex) ? pill('ok','OK') : ''].join('');
+    return `<tr><td><div class="item-name">${esc(r.name)}</div><div class="muted">${esc(r.supplier)} · ${rupee(r.cost)}/${esc(r.unit)}</div></td>
+      <td class="r num" data-label="In stock">${qtyFmt(r.qty,r.unit)}</td>
+      <td data-label="Level"><div class="bar ${low?'low':''}"><span style="width:${pct}%"></span></div></td>
+      <td class="r num muted" data-label="Reorder at">${qtyFmt(r.reorder_level,r.unit)}</td>
+      <td class="num" data-label="Expiry"><div>${niceDate(r.expiry)}${ex?`<div class="muted">${ex.text}</div>`:''}</div></td>
+      <td data-label="Status"><div>${status}</div></td></tr>`;
+  }).join('');
+  const sel = $('#rcvItem'); const keep = sel.value;
+  sel.innerHTML = rows.map(r => `<option value="${r.id}">${esc(r.name)} (${esc(r.unit)})</option>`).join('');
+  if (keep) sel.value = keep;
+}
+
+function renderProducts(){
+  const prods = q('SELECT * FROM products ORDER BY id');
+  $('#prodBody').innerHTML = prods.map(p => {
+    const bs = q('SELECT * FROM batches WHERE product_id = ? AND qty > 0 ORDER BY best_before',[p.id]);
+    const fresh = bs.filter(b => b.best_before >= TODAY).reduce((a,b)=>a+b.qty,0);
+    const expired = bs.filter(b => b.best_before < TODAY).reduce((a,b)=>a+b.qty,0);
+    const today = bs.filter(b => b.best_before === TODAY).reduce((a,b)=>a+b.qty,0);
+    const st = [];
+    if (expired) st.push(pill('bad', `${expired} expired`));
+    if (today) st.push(pill('warn','Sell today'));
+    if (fresh < p.reorder_level) st.push(pill('warn','Bake soon'));
+    if (!st.length) st.push(pill('ok','OK'));
+    const bl = bs.map(b => { const ex = expiryInfo(b.best_before); return `<div class="num ${ex?'':'muted'}" style="font-size:.82rem">${b.qty} pcs · ${niceDate(b.best_before)}${ex?` <span style="color:var(--${ex.cls})">(${ex.text})</span>`:''}</div>`; }).join('') || '<span class="muted">None</span>';
+    return `<tr><td><div class="item-name">${esc(p.name)}</div><div class="muted">${esc(p.category)} · keeps ${p.shelf_days} day${p.shelf_days>1?'s':''}</div></td>
+      <td class="r num" data-label="Price">${rupee(p.price)}</td>
+      <td class="r num" data-label="On counter"><strong>${fresh}</strong> pcs</td>
+      <td data-label="Batches"><div>${bl}</div></td>
+      <td data-label="Status"><div>${st.join('')}</div></td>
+      <td class="r sell-cell"><div class="sell"><input type="number" id="sellQty${p.id}" min="1" value="1" aria-label="Quantity of ${esc(p.name)}"><button class="btn small primary" data-sell="${p.id}" ${fresh?'':'disabled'}>Sell</button></div></td></tr>`;
+  }).join('');
+  const sel = $('#bakeItem'); const keep = sel.value;
+  sel.innerHTML = prods.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  if (keep) sel.value = keep;
+}
+
+function renderBake(){
+  const pid = +$('#bakeItem').value || 1; const n = Math.max(1, +$('#bakeN').value || 1);
+  const p = q('SELECT * FROM products WHERE id = ?',[pid])[0];
+  const needs = recipeNeeds(pid, n);
+  const ok = needs.every(x => x.need <= x.have + 1e-9);
+  $('#bakeYield').innerHTML = `${n} batch${n>1?'es':''} makes <strong>${p.batch_yield*n} × ${esc(p.name)}</strong>, best before ${niceDate(dayOffset(p.shelf_days))}. Ingredients needed:`;
+  $('#needList').innerHTML = needs.map(x => {
+    const enough = x.need <= x.have + 1e-9;
+    return `<div class="need"><span>${esc(x.name)} <span class="have">· have ${qtyFmt(x.have,x.unit)}</span></span><span class="num">${qtyFmt(x.need,x.unit)}</span>${enough?pill('ok','Enough'):pill('bad','Short by '+qtyFmt(x.need-x.have,x.unit))}</div>`;
+  }).join('');
+  $('#bakeBtn').disabled = !ok;
+}
+
+function renderSales(){
+  const s = q('SELECT SUM(amount) AS a, SUM(qty) AS n, COUNT(*) AS c FROM sales WHERE day = ?',[TODAY])[0];
+  $('#salesSummary').textContent = `${rupee(s.a||0)} from ${s.n||0} items across ${s.c||0} bills`;
+  const by = q(`SELECT p.name, SUM(s.qty) AS sold, SUM(s.amount) AS revenue FROM sales s JOIN products p ON s.product_id = p.id WHERE s.day = ? GROUP BY p.name ORDER BY revenue DESC`,[TODAY]);
+  const max = Math.max(1, ...by.map(b=>b.revenue));
+  $('#salesBars').innerHTML = by.map(b => `<div class="sb"><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(b.name)}</span><div class="track"><span style="width:${b.revenue/max*100}%"></span></div><span class="num" style="text-align:right">${rupee(b.revenue)}</span></div>`).join('') || '<p class="muted" style="margin:0">No sales yet today.</p>';
+  $('#salesBody').innerHTML = q(`SELECT s.time, p.name, s.qty, s.amount FROM sales s JOIN products p ON s.product_id = p.id WHERE s.day = ? ORDER BY s.id DESC`,[TODAY])
+    .map(r => `<tr><td class="num" data-label="Time">${r.time}</td><td data-label="Item">${esc(r.name)}</td><td class="r num" data-label="Qty">${r.qty}</td><td class="r num" data-label="Amount">${rupee(r.amount)}</td></tr>`).join('');
+}
+
+function renderHistory(){
+  const kinds = {in:['ok','Received'], bake:['ok','Baked'], sale:['warn','Sold'], waste:['bad','Wasted']};
+  $('#histBody').innerHTML = q('SELECT * FROM movements ORDER BY id DESC').map(r => {
+    const k = kinds[r.kind] || ['ok', r.kind];
+    return `<tr><td class="num" data-label="When">${r.day===TODAY?'Today':niceDate(r.day)} ${r.time}</td><td data-label="Item">${esc(r.item)}</td><td data-label="Type">${pill(k[0],k[1])}</td><td class="r num" data-label="Change">${r.delta>0?'+':''}${qtyFmt(r.delta,r.unit)}</td><td class="muted" data-label="Note">${esc(r.note)}</td></tr>`;
+  }).join('');
+}
+
+function highlight(sql){
+  return esc(sql)
+    .replace(/(&#39;.*?&#39;)/g,'<span class="str">$1</span>')
+    .replace(/\b(SELECT|FROM|WHERE|AND|OR|INSERT|INTO|VALUES|UPDATE|SET|DELETE|JOIN|ON|ORDER BY|GROUP BY|SUM|MIN|MAX|COUNT|ROUND|AS)\b/g,'<span class="kw">$1</span>');
+}
+function renderLog(){
+  if (!LOG.length){ $('#log').innerHTML = '<p class="empty-log">Nothing yet. Try selling a Veg puff.</p>'; return; }
+  $('#log').innerHTML = LOG.map((s,i) => `<pre class="${i<freshCount?'fresh':''}">${highlight(s)}</pre>`).join('');
+  freshCount = 0;
+}
+
+function renderAll(){
+  saveDb();
+  renderFigures(); renderAlerts(); renderIngredients(); renderProducts(); renderBake(); renderSales(); renderHistory(); renderLog();
+  const lowN = q('SELECT COUNT(*) AS c FROM ingredients WHERE qty <= reorder_level')[0].c;
+  const ingTab = document.querySelector('[data-tab="ingredients"]');
+  ingTab.innerHTML = 'Ingredients' + (lowN ? `<span class="count">${lowN}</span>` : '');
+}
+
+let toastTimer;
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.hidden=true, 2600); }
+
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', t.dataset.tab===name ? 'true':'false'));
+  document.querySelectorAll('[data-panel]').forEach(p => p.hidden = p.dataset.panel !== name);
+}
+
+/* ---------- SQL console ---------- */
+const EXAMPLES = () => [
+  ['Low stock', `SELECT name, qty, unit, reorder_level\nFROM ingredients\nWHERE qty <= reorder_level;`],
+  ['Expiring in 3 days', `SELECT name, qty, unit, expiry\nFROM ingredients\nWHERE expiry <= '${dayOffset(3)}'\nORDER BY expiry;`],
+  ["Today's best sellers", `SELECT p.name, SUM(s.qty) AS sold, SUM(s.amount) AS revenue\nFROM sales s JOIN products p ON s.product_id = p.id\nWHERE s.day = '${TODAY}'\nGROUP BY p.name\nORDER BY revenue DESC;`],
+  ['Counter by batch', `SELECT p.name, b.qty, b.made_on, b.best_before\nFROM batches b JOIN products p ON b.product_id = p.id\nORDER BY b.best_before;`],
+  ['Cost to bake 1 batch', `SELECT p.name, SUM(r.qty * i.cost) AS ingredient_cost,\n       p.price * p.batch_yield AS sales_value\nFROM recipes r\nJOIN ingredients i ON r.ingredient_id = i.id\nJOIN products p ON r.product_id = p.id\nGROUP BY p.name, p.price, p.batch_yield;`],
+  ['Stock value by supplier', `SELECT supplier, SUM(qty * cost) AS stock_value\nFROM ingredients\nGROUP BY supplier\nORDER BY stock_value DESC;`],
+];
+function runConsole(){
+  const sql = $('#sqlInput').value.trim().replace(/;\s*$/,'');
+  const errEl = $('#sqlErr'); errEl.hidden = true;
+  if (!sql) return;
+  try{
+    const res = q(sql, [], true);
+    const out = $('#sqlResult');
+    if (Array.isArray(res) && res.length && typeof res[0] === 'object'){
+      const cols = Object.keys(res[0]);
+      out.innerHTML = `<table><thead><tr>${cols.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${res.map(r=>`<tr>${cols.map(c=>{const v=r[c]; return `<td class="num">${typeof v==='number'? esc(Math.round(v*100)/100) : esc(v ?? '')}</td>`;}).join('')}</tr>`).join('')}</tbody></table>`;
+    } else if (Array.isArray(res)) {
+      out.innerHTML = `<p class="muted" style="margin:0;padding:12px">No rows matched.</p>`;
+    } else {
+      out.innerHTML = `<p class="muted" style="margin:0;padding:12px">Done. ${esc(res)} row(s) changed.</p>`;
+    }
+    renderAll();
+  }catch(e){ errEl.textContent = 'The database could not run that query: ' + e.message; errEl.hidden = false; }
+}
+
+/* ---------- events ---------- */
+$('#tabs').addEventListener('click', e => { const t = e.target.closest('.tab'); if (t) showTab(t.dataset.tab); });
+document.addEventListener('click', e => {
+  const s = e.target.closest('[data-sell]');
+  if (s){ const id = +s.dataset.sell; const n = Math.max(1, Math.floor(+$('#sellQty'+id).value || 1)); sell(id, n); renderAll(); return; }
+  const g = e.target.closest('[data-goto]'); if (g){ showTab(g.dataset.goto); return; }
+  const r = e.target.closest('[data-receive]');
+  if (r){ showTab('ingredients'); const opt = [...$('#rcvItem').options].find(o => o.textContent.startsWith(r.dataset.receive)); if (opt) $('#rcvItem').value = opt.value; $('#rcvQty').focus(); }
+});
+$('#receiveForm').addEventListener('submit', e => { e.preventDefault(); const qty = +$('#rcvQty').value; if (qty>0){ receive(+$('#rcvItem').value, qty, $('#rcvExp').value); renderAll(); }});
+$('#newIngForm').addEventListener('submit', e => { e.preventDefault();
+  addIngredient({name:$('#niName').value.trim(), unit:$('#niUnit').value, qty:+$('#niQty').value, reorder:+$('#niReorder').value, cost:+$('#niCost').value, expiry:$('#niExp').value});
+  $('#niName').value=''; renderAll(); });
+$('#bakeForm').addEventListener('submit', e => { e.preventDefault(); bake(+$('#bakeItem').value, Math.max(1, Math.floor(+$('#bakeN').value||1))); renderAll(); });
+$('#bakeItem').addEventListener('change', renderBake);
+$('#bakeN').addEventListener('input', renderBake);
+$('#writeOffBtn').addEventListener('click', () => { writeOff(); renderAll(); });
+$('#runSql').addEventListener('click', runConsole);
+$('#sqlInput').addEventListener('keydown', e => { if ((e.ctrlKey||e.metaKey) && e.key==='Enter') runConsole(); });
+$('#clearLog').addEventListener('click', () => { LOG.length = 0; renderLog(); });
+$('#resetBtn').addEventListener('click', () => { seed(); LOG.length = 0; renderAll(); toast('Demo data reset'); });
+
+/* ---------- start ---------- */
+$('#todayLabel').textContent = new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+$('#rcvExp').value = dayOffset(30); $('#niExp').value = dayOffset(90);
+$('#schemaText').textContent = SCHEMA;
+$('#chips').innerHTML = EXAMPLES().map((x,i)=>`<button class="chip" type="button" data-ex="${i}">${esc(x[0])}</button>`).join('');
+$('#chips').addEventListener('click', e => { const c = e.target.closest('[data-ex]'); if (c){ $('#sqlInput').value = EXAMPLES()[+c.dataset.ex][1]; runConsole(); }});
+$('#sqlInput').value = EXAMPLES()[0][1];
+
+if (!window.alasql){ $('#alerts').innerHTML = '<div class="alert-row bad"><span class="what">The database engine did not load. Check your internet connection and reload the page.</span></div>'; return; }
+if (IN_APP) $('#footNote').textContent = 'Demo data. Prices in ₹. Everything is saved on this phone. Tap "Reset demo data" to start fresh.';
+if (!loadDb()) seed();
+renderAll(); runConsole(); LOG.length = 0; renderLog();
+})();
+</script>
